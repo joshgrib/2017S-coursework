@@ -1,9 +1,10 @@
 # CS 496 B - Programming Languages
+Call number: 10447
 
 ## Professor info
 Instructor: Eduardo Bonelli
 Email: ebonelli@stevens.edu
-Lieb 304 - WF 7-9pm
+Office hours: Lieb 304 - WF 7-9pm
 
 ## Grading
 Item|Weight
@@ -19,8 +20,9 @@ Final(optional if grade is 90+)|20%
 * **Quizzes on Wednesdays** - 0 if absent without notice
 
 ## Meeting times
-Lecture MWF 11-12 in EAS 330
+Lecture: MWF 11-12 in EAS 330
 
 ## General notes
 * Bonelli is out sick for two weeks after the first week
 * Week 2 - no lecture MF, W is just CAs
+* https://docs.racket-lang.org/
