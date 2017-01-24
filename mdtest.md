@@ -45,6 +45,7 @@ $$
 | Pipe      |    1 USD | 234  |
 
 
+
 ```{mermaid}
 %% Example diagram
 graph LR
