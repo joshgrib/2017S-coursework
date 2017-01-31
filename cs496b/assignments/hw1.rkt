@@ -1,12 +1,11 @@
-;; QUESTIONS
-;; Type notation on 1:4 - bit?
-;; Type notation on 1:(8, 9, 10)
-
 #lang racket
 ;;  Josh Gribbon
 ;;  CS496A - Programming Languages
 ;;  Homework 1
-;; I pledge my honor I have abided by the Stevens Honor System. ~Josh Gribbon
+;;  I pledge my honor I have abided by the Stevens Honor System. ~Josh Gribbon
+
+;; NOTE: There are a bunch of test cases at the end of the file to check out,
+;; and running the file will test all the parts
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;  Exercise 1
@@ -112,45 +111,123 @@
             (lst_belongsTo (cdr set) x))))
 ;; {[a], [a]} -> [a]
 (define (lst_union set1 set2)
-    set1)
+    ;;recurse through set2, add it to set1 if it's not in there
+    (if (equal? set2 '())
+        set1
+        (if (lst_belongsTo set1 (car set2))
+            (lst_union set1 (cdr set2))
+            (lst_union (append set1 (list (car set2))) (cdr set2)))))
 ;; {[a], [a]} -> [a]
 (define (lst_intersection set1 set2)
-    ;;recurse through set1 and check for membership in set 2,
     (if (equal? set1 '())
         '()
         (if (lst_belongsTo set2 (car set1))
             (cons (car set1) (lst_intersection (cdr set1) set2))
-            (lst_intersection (cdr set1) set2)
-        )))
+            (lst_intersection (cdr set1) set2))))
 
 ;; Problem 2
-(define (remDups dupList)
-    dupList)
+;; [a] -> [a]
+(define (remDups lst)
+    (if (< (length lst) 2)
+        lst
+        (if (equal? (car lst) (cadr lst))
+            (remDups (cdr lst))
+            (cons (car lst) (remDups (cdr lst))))))
 
 ;; Problem 3
+;; [a] -> [[a]]
 (define (sublists lst)
-    lst)
+    (if (equal? lst '())
+        '(())
+        (append-map
+            (lambda (x)
+                (list x (cons (car lst) x)))
+            (sublists (cdr lst)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;  Exercise 3
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Problem 1
-
+;; {a->a, a} -> a
+(define (mapC fx E)
+    (match E
+        [(list 'const C)
+            (list 'const (fx C))]
+        [(list op leftE rightE)
+            (list
+                op
+                (mapC fx leftE)
+                (mapC fx rightE))]))
 
 ;; Problem 2
-
+;; {{a a}->a {a a}->a {a a}->a {a a}->a a->b a} -> b
+(define (foldC fxAdd fxSub fxMult fxDiv fxNum E)
+    (match E
+        [(list 'const C) (fxNum C)]
+        [(list 'add e1 e2)
+            (fxAdd
+                (foldC fxAdd fxSub fxMult fxDiv fxNum e1)
+                (foldC fxAdd fxSub fxMult fxDiv fxNum e2))]
+        [(list 'sub e1 e2)
+            (fxSub
+                (foldC fxAdd fxSub fxMult fxDiv fxNum e1)
+                (foldC fxAdd fxSub fxMult fxDiv fxNum e2))]
+        [(list 'mult e1 e2)
+            (fxMult
+                (foldC fxAdd fxSub fxMult fxDiv fxNum e1)
+                (foldC fxAdd fxSub fxMult fxDiv fxNum e2))]
+        [(list 'div e1 e2)
+            (fxDiv
+                (foldC fxAdd fxSub fxMult fxDiv fxNum e1)
+                (foldC fxAdd fxSub fxMult fxDiv fxNum e2))]
+        [_ (error "Bad expression")]))
 
 ;; Problem 3
-
+;; a -> num
+(define (numAdd E)
+    (foldC
+        (lambda (x y) (+ 1 x y))
+        (lambda (x y) (+ x y))
+        (lambda (x y) (+ x y))
+        (lambda (x y) (+ x y))
+        (lambda (x) 0)
+        E
+    ))
 
 ;; Problem 4
-
+;; a -> a
+(define (addToMult E)
+    (foldC
+        (lambda (x y) (list 'mult x y))
+        (lambda (x y) (list 'sub x y))
+        (lambda (x y) (list 'mult x y))
+        (lambda (x y) (list 'div x y))
+        (lambda (x) (list 'const x))
+        E))
 
 ;; Problem 5
-
+;; a -> num
+(define (evalC_help E)
+    (match E
+        [(list 'const C)
+            C]
+        [(list 'add e1 e2)
+            (+ (evalC_help e1) (evalC_help e2))]
+        [(list 'sub e1 e2)
+            (- (evalC_help e1) (evalC_help e2))]
+        [(list 'mult e1 e2)
+            (* (evalC_help e1) (evalC_help e2))]
+        [(list 'div e1 e2)
+            (/ (evalC_help e1) (evalC_help e2))]
+        [_ (error "Bad expression")]))
+;; a -> b
+(define (evalC E)
+    (list 'const (evalC_help E)))
 
 ;; Problem 6
-
+;; a -> num
+(define (evalCf E)
+    (list 'const (foldC + - * / (lambda (x) x) E)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;  Exercise 4
@@ -178,10 +255,9 @@
 ;; Problem 2
 ;; [[a]] -> [a]
 (define (concat xss)
-    (let
-        ((g (lambda (xs h) xs)))
-        (foldl g identity xss)
-    ))
+    (let ((g (lambda (xs h) (append xs h))))
+    (foldr g null xss))
+)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;  Test cases
@@ -287,17 +363,16 @@
         (equal? (lst_belongsTo '(1 2 3) 3) #t)
         (equal? (lst_belongsTo '(1 2 3) 0) #f)
         (equal? (lst_belongsTo '(1 2 3) 4) #f)
-;;        (equal? (lst_union '(1 2 3) '(1 2 3)) '(1 2 3))
-;;        (equal? (lst_union '(1 2 3) '(1 4 5)) '(1 2 3 4 5))
-;;        (equal? (lst_union '(1 2 3) '(8)) '(1 2 3 8))
-;;        (equal? (lst_union '(1) '(8)) '(1 8))
-;;        (equal? (lst_union '() '()) '())
+        (equal? (lst_union '(1 2 3) '(1 2 3)) '(1 2 3))
+        (equal? (lst_union '(1 2 3) '(1 4 5)) '(1 2 3 4 5))
+        (equal? (lst_union '(1 2 3) '(8)) '(1 2 3 8))
+        (equal? (lst_union '(1) '(8)) '(1 8))
+        (equal? (lst_union '() '()) '())
         (equal? (lst_intersection '(1 2 3) '(1 -2 3)) '(1 3))
         (equal? (lst_intersection '(1 2 3) '(1 4 5)) '(1))
         (equal? (lst_intersection '(1 2 3) '(8)) '())
         (equal? (lst_intersection '(1 3 5) '(3 5 9)) '(3 5))
-        (equal? (lst_intersection '(1) '()) '())
-))
+        (equal? (lst_intersection '(1) '()) '())))
 (define test_ex2p2
     (and
         (equal? (remDups '(1 2 3)) '(1 2 3))
@@ -308,27 +383,61 @@
 (define test_ex2p3
     (and
         (equal? (sublists '(1 2 3)) '(() (1) (2) (1 2) (3) (1 3) (2 3) (1 2 3)))
-        ((equal? (sublists '(1 2)) '(() (1) (2) (1 2)))
-        (equal? (sublists '()) '(())))))
+        (equal? (sublists '(1 2)) '(() (1) (2) (1 2)))
+        (equal? (sublists '()) '(()))))
 ;;;;;;;;;;;;;;;;;;; Exercse 3 test cases
+(define e1
+    '(const 2))
+(define e2
+    '(add (sub (const 2) (const 3)) (const 4)))
+(define e3
+    '(add (sub (const 2) (const 3)) (add (sub (const 2) (const 3)) (const 4))))
+(define e4
+    '(mult (sub (const 2) (const 3)) (const 4)))
 (define test_ex3p1
     (and
-        (equal? #t #t)))
+        (equal?
+            (mapC (lambda (x) (+ x 1)) e2)
+            '(add (sub (const 3) (const 4)) (const 5)))
+        (equal?
+            (mapC (lambda (x) (* x 2)) e2)
+            '(add (sub (const 4) (const 6)) (const 8)))
+        (equal?
+            (mapC (lambda (x) (- x 1)) e2)
+            '(add (sub (const 1) (const 2)) (const 3)))))
 (define test_ex3p2
     (and
-        (equal? #t #t)))
+        (equal? (foldC + - * / (lambda (x) x) e2) 3)
+        (equal? (foldC - + * / (lambda (x) x) e2) 1)
+        (equal? (foldC + + + + (lambda (x) x) e2) 9)))
 (define test_ex3p3
     (and
-        (equal? #t #t)))
+        (equal? (numAdd e2) 1)
+        (equal? (numAdd e3) 2)
+        (equal? (numAdd e4) 0)))
 (define test_ex3p4
     (and
-        (equal? #t #t)))
+        (equal?
+            (addToMult e2)
+            '(mult (sub (const 2) (const 3)) (const 4)))
+        (equal?
+            (addToMult e3)
+            '(mult (sub (const 2) (const 3)) (mult (sub (const 2) (const 3)) (const 4))))
+        (equal?
+            (addToMult '(add (const 2) (const 3)))
+            '(mult (const 2) (const 3)))))
 (define test_ex3p5
     (and
-        (equal? #t #t)))
+        (equal? (evalC e1) '(const 2))
+        (equal? (evalC e2) '(const 3))
+        (equal? (evalC e3) '(const 2))
+        (equal? (evalC e4) '(const -4))))
 (define test_ex3p6
     (and
-        (equal? #t #t)))
+        (equal? (evalCf e1) '(const 2))
+        (equal? (evalCf e2) '(const 3))
+        (equal? (evalCf e3) '(const 2))
+        (equal? (evalCf e4) '(const -4))))
 ;;;;;;;;;;;;;;;;;;; Exercse 4 test cases
 (define test_ex4p1
     (and
@@ -341,7 +450,8 @@
 (define test_ex4p2
     (and
         (equal? (concat '((1 2) (3 4))) '(1 2 3 4))
-        (equal? (concat '(() ())) '())))
+        (equal? (concat '(() ())) '())
+        (equal? (concat '((1 2) (4 5 6 7) (3))) '(1 2 4 5 6 7 3))))
 
 ;;;;;;;;;;;;;;;;;;; Total Exercise tests
 ;;utility method to print the error and return false, or just return true
@@ -398,14 +508,13 @@
     (if
         (and
             (clr2 test_ex1 1)
-            ;;(clr2 test_ex2 2)
-            ;;(clr2 test_ex3 3)
+            (clr2 test_ex2 2)
+            (clr2 test_ex3 3)
             (clr2 test_ex4 4)
         )
         #t
         #f))
 
-(if
-    test_all
+(if test_all
     "All tests passed!"
     "Tests failed!")

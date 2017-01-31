@@ -1,0 +1,25 @@
+The Agile Manifesto includes 12 principles.
+* Pick any three of the twelve principles
+    * describe how the principle compares to the processes and procedures used in plan driven approaches that preceded Agile Methods.
+    * What are the advantages and disadvantages of these principles for small teams with up to 10 developers and for large teams with 100+ developers?
+
+Welcome changing requirements, even late in development. Agile processes harness change for the customer's competitive advantage.
+========
+In a plan driven approach the plan is developed at the beginning and then adhered to as strictly as possible. While this made sense for planning and budgeting for project, Agile gets the speed and agility that comes from being flexible in development.
+
+Smaller teams would have an advantage here due to it being easier to change a plan with less moving parts and people involved. In a larger team there's more momentum to swing around when changing directions, but if done well they have more power in pursuing any plan.
+
+
+
+Deliver working software frequently, from a couple of weeks to a couple of months, with a preference to the shorter timescale.
+========
+In a plan driven approach the planning stage has to happen before the development begins, so large project would involve a lot of planning upfront, and then the development would happen until the software is ready to be released. In agile however the planning is consistently happening alongside the project for a continuous flow. This style means that after a stable release is made, there is always a working version that just receives updates with the new development. Consistent updates mean the project can adapt and grow with the needs of the user.
+
+I'd argue that for this principle the size of the team doesn't matter as long as they are a good size for the project. A 1 person team with a small project should be able to make frequent releases just as easily as a large team with a large project.
+
+
+
+The best architectures, requirements, and designs emerge from self-organizing teams.
+========
+In a plan-driven approach these things would mostly be managed and created during the planning stage, and then the implementation and details are worked out during the development. Agile benefits over this by utilizing the people closest to the problems, and also having more people exposed and involved in the "big ideas", instead of just a few that may be an expert in theory more than practice.
+Larger teams would definitely benefit here just from having more brains thinking about all these things, instead of just a handful.
