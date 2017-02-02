@@ -105,3 +105,42 @@ Seymore Cray worked here and also started Cray Computers, and together these com
 #### 7. General Electric
 Multics - ARPA funded project MAC (1961)
 The root of all Unix systems
+
+> **Why is all this happening in the US?**
+The world wars pretty much messed up all the big powers at home except us and the Soviet Union. Here the US had a big advantage by have capitalism to support random crazy ideas from anyone and support for innovation.
+Additionally IBM also had a global presence since the 1800 making money all over the place and making their brand well known.
+
+## Mainframe culture
+There needs to be a "semi-authoritarian hierarchical system" to support and allow for a mainframe. Mainframes create centralized power structures, for better or worse.
+Some uses:
+* ATMs - you have to keep track of all the transactions
+* Reservation systems - previously done manually using paper files and phone calls to verify the reservation. Ticketing agent, tracking everything, airport attendant, and all the process are basically eliminating.
+    * The SABRE system used technology made for SAGE to handle reservations and flight tracking
+* Credit cards - basically asking some random entity you don't know for money and promising you'll pay it back
+* Remote businesses (timesharing)
+
+### Space race - IBM
+* Mercury - 1st manned space flight
+* Gemini - 2nd manned space flight
+* Apollo (Command Module had > 2 million parts, mainframes were vital for tracking)
+
+### Geopolitics
+* Hydrogen bombs
+    * Hiroshima and Nagasaki bombs were actually done without mainframes and maybe without punch cards too, mostly just people thinking
+* Missile defense systems
+* Surveillance - as early as the 1960s mainframes were being used to monitor US citizen communication automatically
+
+## Centralized VS Decentralized technology and power
+Mainframes are centralized and put a lot of power concentrated in one place, while personal computers give a lot of people access to computing power.
+
+A similar situation is nuclear power VS solar power. Solar lets anyone make their own power easily, so it makes the whole system more robust while minimizing the power in any one place.
+
+Something Apple (and Uber recently) are all about is providing power to the people to have more freedom.
+
+**FOSS** - Free and Open Source Software. Free to "hack" and modify as you wish, as long as you follow the license. Founded by Richard Stallman - "Free as in freedom, not free as in beer".
+* IBM made money by selling the computer, and then if you want to change it you pay IBM to make the changes
+    * Starting with the 360 as the compatible computer, other companies were able to come in and make products to work with IBMs computers, instead of only IBM making them.
+
+**IBM had a self-image mirroring their technology as deeply centralized and hierarchical, whereas Apple would see themselves as more egalitarian**
+
+**Both money and culture play a role in technology**

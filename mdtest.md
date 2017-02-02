@@ -34,6 +34,8 @@ x =
     {-b \pm \sqrt{b^2 - 4ac}}
     {2a}
 $$
+[LaTeX Character Reference](http://www.combinatorics.net/weblib/)
+
 - [ ] Checkboxes?
 - [x] check.
 
