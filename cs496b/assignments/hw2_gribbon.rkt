@@ -115,13 +115,12 @@
             [(eq? (car l1) (car l2)) (compLst (cdr l1) (cdr l2))]
             [else #f]))
     (define (replaceHelper dth gh p)
-        (print p)
         (cases dTree dth
             (leaf-t (n)
                 (leaf-t
-                    (memf
+                    (cdar (memf
                         (lambda (x) (compLst p (car x)))
-                        gh)))
+                        gh))))
             (node-t (id lt rt)
                 (node-t
                     id
@@ -146,11 +145,26 @@
     ((1 0 1) . 0)
     ((1 1 0) . 0)
     ((1 1 1) . 1)))
-(replaceLeafAt t3 g1)
+;;(replaceLeafAt t3 g1)
 
 
 ;; Problem 6
-;; TYPE
+;; maps := ([num] num)
+;; ([sym] [maps]) -> dTree
 (define (df->dTree bf)
-    t1
+    (replaceLeafAt
+        (list->tree (car bf))
+        (cdr bf)
+    )
 )
+(define binFn
+    '(( x y z ) . (
+        ((0 0 0) . 0)
+        ((0 0 1) . 1)
+        ((0 1 0) . 1)
+        ((0 1 1) . 0)
+        ((1 0 0) . 1)
+        ((1 0 1) . 0)
+        ((1 1 0) . 0)
+        ((1 1 1) . 1))))
+;;(df->dTree binFn)
