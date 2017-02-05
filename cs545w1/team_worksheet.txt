@@ -1,0 +1,20 @@
+Team Worksheet 1 – CS545
+
+Name of Project: Language learning game
+
+
+List of Team Members:
+
+Anqi Shao
+Himanshu Goel
+Josh Gribbon 
+Michael Pszonka 
+Ruth Dennehy
+Yeuh-Jung Tsou
+
+
+Brief Description of Project (2-4 sentences):
+
+A web interface game to help people learn languages. The user can choose sets of flashcards to learn from, then the system will quiz them whenever they want. Progress can be tracked by percent correct per session and show history of proficiency.
+
+"E" Focus: Easy-to-learn
