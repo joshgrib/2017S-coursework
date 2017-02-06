@@ -5,8 +5,8 @@
 /* Declare different function types */
 typedef int (*funct_t) (void);
 typedef int (*funct1_t)(int);
-typedef int (*funct2_t)(int, int); 
-typedef int (*funct3_t)(int, int, int); 
+typedef int (*funct2_t)(int, int);
+typedef int (*funct3_t)(int, int, int);
 
 /* Combine all the information about a function and its tests as structure */
 typedef struct {
@@ -23,10 +23,3 @@ typedef struct {
 } test_rec, *test_ptr;
 
 extern test_rec test_set[];
-
-
-
-
-
-
-

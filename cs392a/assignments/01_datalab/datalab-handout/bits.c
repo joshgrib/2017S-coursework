@@ -149,6 +149,7 @@ NOTES:
 /* wchar_t uses ISO/IEC 10646 (2nd ed., published 2011-03-15) /
    Unicode 6.0.  */
 /* We do not support C11 <threads.h>.  */
+
 /* 1 */
 /*
  * bitAnd - x&y using only ~ and |
@@ -158,8 +159,7 @@ NOTES:
  *   Rating: 1
  */
 int bitAnd(int x, int y) {
-    //I think ~A|~B == &
-  return 2;
+    return ~(~x|~y);
 }
 /* 2 */
 /*
@@ -171,7 +171,10 @@ int bitAnd(int x, int y) {
  *   Rating: 2
  */
 int getByte(int x, int n) {
-  return 2;
+    int shift_num = n << 3;//map 0,1,2,3 to 0,8,16,24 respectively
+    int shifted = x >> shift_num;
+    int masked = shifted & 0xff;
+    return masked;
 }
 /* 3 */
 /*
@@ -182,7 +185,8 @@ int getByte(int x, int n) {
  *   Rating: 3
  */
 int conditional(int x, int y, int z) {
-  return 2;
+    int x_mask = !x + ~0;
+    return (x_mask & y)|(~x_mask & z);
 }
 /*
  * replaceByte(x,n,c) - Replace byte n in x with c
@@ -194,7 +198,10 @@ int conditional(int x, int y, int z) {
  *   Rating: 3
  */
 int replaceByte(int x, int n, int c) {
-  return 2;
+    int shiftVal = n << 3;
+    int mask = 0xff << shiftVal;
+    int shifted = c << shiftVal;
+    return (x&~mask)|shifted;
 }
 /* 4 */
 /*
@@ -206,7 +213,8 @@ int replaceByte(int x, int n, int c) {
  *   Rating: 4
  */
 int logicalNeg(int x) {
-  return 2;
+    int negx = ~x + 1;
+    return ~((negx|x)>>31)&1;
 }
 /* 1 */
 /*
@@ -216,7 +224,7 @@ int logicalNeg(int x) {
  *   Rating: 1
  */
 int tmin(void) {
-  return 2;
+    return 1<<31;
 }
 /* 2 */
 /*
@@ -229,7 +237,8 @@ int tmin(void) {
  *   Rating: 2
  */
 int fitsBits(int x, int n) {
-  return 2;
+    n = n + ~0; //n = n - 1
+	return  ((!(((1<<n)+~x)>>31)) | (x>>31)) & !((x>>31)&(x+(1<<n))>>31);
 }
 /*
  * negate - return -x
@@ -239,7 +248,7 @@ int fitsBits(int x, int n) {
  *   Rating: 2
  */
 int negate(int x) {
-  return 2;
+    return ~x+1;
 }
 /* 3 */
 /*
@@ -250,7 +259,7 @@ int negate(int x) {
  *   Rating: 3
  */
 int isNonNegative(int x) {
-  return 2;
+    return ((~x)>>31)&0x01;
 }
 /*
  * isLessOrEqual - if x <= y  then return 1, else return 0
@@ -260,7 +269,9 @@ int isNonNegative(int x) {
  *   Rating: 3
  */
 int isLessOrEqual(int x, int y) {
-  return 2;
+    int negx = x>>31;
+    int negy = y>>31;
+    return !(((!negx) & negy) | ((!(negx ^ negy)) & (y+~x+1)>>31));
 }
 /* 4 */
 /*
@@ -272,5 +283,6 @@ int isLessOrEqual(int x, int y) {
  *   Rating: 4
  */
 int absVal(int x) {
-  return 2;
+    int mask = x>>31;
+    return (x^mask)+~mask+1L;
 }
