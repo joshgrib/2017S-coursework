@@ -29,7 +29,7 @@ public class AmicableNumbers {
 		//gets the starting time in milliseconds
 		long start = System.currentTimeMillis();
 		//this is the number we are calculating against
-		int num = 100000;
+		int num = 1000000;
         //collect values
         ArrayList<Integer> amicables = new ArrayList<Integer>();
 
@@ -42,7 +42,7 @@ public class AmicableNumbers {
             boolean amicable = i == sumDivisors(sumDivs);
             //dont add pairs that are the same number
             boolean ident = i == sumDivs;
-            if(amicable && !alreadyFound && !ident){//new amicable pair
+            if(amicable && !alreadyFound && !ident && (sumDivs <= num)){//new amicable pair
                 amicables.add(i);
                 amicables.add(sumDivs);
                 System.out.printf("(%d,%d)\n", i, sumDivs);

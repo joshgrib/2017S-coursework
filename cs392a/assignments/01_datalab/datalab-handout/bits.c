@@ -185,7 +185,7 @@ int getByte(int x, int n) {
  *   Rating: 3
  */
 int conditional(int x, int y, int z) {
-    int x_mask = !x + ~0;
+    int x_mask = !x - 1;
     return (x_mask & y)|(~x_mask & z);
 }
 /*
