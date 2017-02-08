@@ -159,6 +159,9 @@ NOTES:
  *   Rating: 1
  */
 int bitAnd(int x, int y) {
+    /*
+    A&B is logically equivalent to ~(~A|~B)
+    */
     return ~(~x|~y);
 }
 /* 2 */
@@ -171,6 +174,11 @@ int bitAnd(int x, int y) {
  *   Rating: 2
  */
 int getByte(int x, int n) {
+    /*
+    Shift n by 3, multiplying by 8
+    This number maps to the bit shift to move the desired byte to the right
+    Then the mask isolates the part we want
+    */
     int shift_num = n << 3;//map 0,1,2,3 to 0,8,16,24 respectively
     int shifted = x >> shift_num;
     int masked = shifted & 0xff;
@@ -185,7 +193,17 @@ int getByte(int x, int n) {
  *   Rating: 3
  */
 int conditional(int x, int y, int z) {
-    int x_mask = !x - 1;
+    /*
+    create the x mask using two's complement negation
+    for each bit there are two cases
+    1. x is 1, so we use the bit from y
+        (x&y)
+    2. x is not 1, so we use the bit from z
+        (~x&z)
+    Only one of these cases can be hit each time so we combine with OR
+    (x&y)|(~x&z)
+    */
+    int x_mask = !x + ~0;
     return (x_mask & y)|(~x_mask & z);
 }
 /*
@@ -198,6 +216,13 @@ int conditional(int x, int y, int z) {
  *   Rating: 3
  */
 int replaceByte(int x, int n, int c) {
+    /*
+    Shift 3 to multiply by 8 to map to the shift amount
+    Create a mask by taking 255 and shifting it to the desired byte location
+    Shift the input byte to the right location, trailing 0s
+    When the mask is 0 we want to keep the original bit (x&~mask)
+    Otherwise we want to use the new byte in its shifted position |shifted
+    */
     int shiftVal = n << 3;
     int mask = 0xff << shiftVal;
     int shifted = c << shiftVal;
@@ -212,10 +237,17 @@ int replaceByte(int x, int n, int c) {
  *   Max ops: 12
  *   Rating: 4
  */
-int logicalNeg(int x) {
-    int negx = ~x + 1;
-    return ~((negx|x)>>31)&1;
-}
+ int logicalNeg(int x) {
+     /*
+     negate x with 2's complement negation
+     only 0 would have a 0 in the leftmost bit after negation, by shifting 31 to
+     the right we git that bit, then & with 1 to see if it is a 1 or a 0. If it's
+     a 0 we want to return a 1, so we NOT that result
+     */
+     int negx = ~x + 1;
+     int leftMostBit = (negx|x)>>31;
+     return ~leftMostBit&1;
+ }
 /* 1 */
 /*
  * tmin - return minimum two's complement integer
@@ -224,6 +256,10 @@ int logicalNeg(int x) {
  *   Rating: 1
  */
 int tmin(void) {
+    /*
+    Take a single 1 bit and shift it all the way to the left,
+    creating the lowest negative number
+    */
     return 1<<31;
 }
 /* 2 */
@@ -237,8 +273,39 @@ int tmin(void) {
  *   Rating: 2
  */
 int fitsBits(int x, int n) {
+    /*
+    n-1 = mask_length
+    mask = 1 << mask_length - 1 (mask length is the input minus 1 for the 0x01
+                                we start with and minus 1 to keep room for 2s
+                                complement)
+    out_of_bounds = x & ~mask   to get any bits needed outside the mask
+
+    n-1 = mask_length to leave room for 2s complement
+    mask = 0x10 << mask_lenght - 1 to account for 0 already there
+    x & mask leaves anything outside the mask
+
+    xIsNeg = (x>>31)&1
+    shifted = x>>n-1 shifts out meaningful bits,
+              leaving just 1s or 0s in a valid number
+    xIsNeg:
+        shifted should be all 1s
+        !~shifted
+    !xIsNeg:
+        shifted should be all 0s
+        !shifted
+
+    */
+    int xIsNeg = (x>>31)&1;
+    printf(xIsNeg);
+    int shifted = x>>(n-1);
+    return (xIsNeg & !(~shifted)) | (!xIsNeg & !shifted);
+    /*
     n = n + ~0; //n = n - 1
-	return  ((!(((1<<n)+~x)>>31)) | (x>>31)) & !((x>>31)&(x+(1<<n))>>31);
+	return
+        ( (!(((1<<n)+~x)>>31))
+          | (x>>31))
+        & !((x>>31)&(x+(1<<n))>>31);
+    */
 }
 /*
  * negate - return -x
