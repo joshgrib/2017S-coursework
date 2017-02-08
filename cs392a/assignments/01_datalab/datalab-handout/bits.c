@@ -179,9 +179,10 @@ int getByte(int x, int n) {
     This number maps to the bit shift to move the desired byte to the right
     Then the mask isolates the part we want
     */
-    int shift_num = n << 3;//map 0,1,2,3 to 0,8,16,24 respectively
-    int shifted = x >> shift_num;
-    int masked = shifted & 0xff;
+    int shift_num, shifted, masked;
+    shift_num = n << 3;//map 0,1,2,3 to 0,8,16,24 respectively
+    shifted = x >> shift_num;
+    masked = shifted & 0xff;
     return masked;
 }
 /* 3 */
@@ -223,9 +224,10 @@ int replaceByte(int x, int n, int c) {
     When the mask is 0 we want to keep the original bit (x&~mask)
     Otherwise we want to use the new byte in its shifted position |shifted
     */
-    int shiftVal = n << 3;
-    int mask = 0xff << shiftVal;
-    int shifted = c << shiftVal;
+    int shiftVal, mask, shifted;
+    shiftVal = n << 3;
+    mask = 0xff << shiftVal;
+    shifted = c << shiftVal;
     return (x&~mask)|shifted;
 }
 /* 4 */
@@ -244,8 +246,9 @@ int replaceByte(int x, int n, int c) {
      the right we git that bit, then & with 1 to see if it is a 1 or a 0. If it's
      a 0 we want to return a 1, so we NOT that result
      */
-     int negx = ~x + 1;
-     int leftMostBit = (negx|x)>>31;
+     int negx, leftMostBit;
+     negx = ~x + 1;
+     leftMostBit = (negx|x)>>31;
      return ~leftMostBit&1;
  }
 /* 1 */
@@ -274,38 +277,18 @@ int tmin(void) {
  */
 int fitsBits(int x, int n) {
     /*
-    n-1 = mask_length
-    mask = 1 << mask_length - 1 (mask length is the input minus 1 for the 0x01
-                                we start with and minus 1 to keep room for 2s
-                                complement)
-    out_of_bounds = x & ~mask   to get any bits needed outside the mask
-
-    n-1 = mask_length to leave room for 2s complement
-    mask = 0x10 << mask_lenght - 1 to account for 0 already there
-    x & mask leaves anything outside the mask
-
-    xIsNeg = (x>>31)&1
-    shifted = x>>n-1 shifts out meaningful bits,
-              leaving just 1s or 0s in a valid number
-    xIsNeg:
-        shifted should be all 1s
-        !~shifted
-    !xIsNeg:
-        shifted should be all 0s
-        !shifted
-
+    make mask by cloning the leftmost bit
+    shift x to remove bits that would change if needed
+    this leaves all 1s for negatives, and all 0s for positives,
+    same as the mask.
+    The mask and shifted values should both be all 1s or all 0s
+    XOR leaves only differences, no differences means it fits
     */
-    int xIsNeg = (x>>31)&1;
-    printf(xIsNeg);
-    int shifted = x>>(n-1);
-    return (xIsNeg & !(~shifted)) | (!xIsNeg & !shifted);
-    /*
-    n = n + ~0; //n = n - 1
-	return
-        ( (!(((1<<n)+~x)>>31))
-          | (x>>31))
-        & !((x>>31)&(x+(1<<n))>>31);
-    */
+    int mask, shifted, badBits;
+    mask = x >> 31;
+    shifted = x >> (n + ~0);
+    badBits = shifted ^ mask;
+    return !badBits;
 }
 /*
  * negate - return -x
@@ -315,6 +298,9 @@ int fitsBits(int x, int n) {
  *   Rating: 2
  */
 int negate(int x) {
+    /*
+    2s complement negation
+    */
     return ~x+1;
 }
 /* 3 */
@@ -326,7 +312,13 @@ int negate(int x) {
  *   Rating: 3
  */
 int isNonNegative(int x) {
-    return ((~x)>>31)&0x01;
+    /*
+    Flip all bits so any negative number now has a 0 in the leftmost bit
+    Shift that bit all the way to the right
+    Check that it is a 1
+    */
+    int flipShift = ~x>>31;
+    return flipShift&0x01;
 }
 /*
  * isLessOrEqual - if x <= y  then return 1, else return 0
@@ -336,9 +328,20 @@ int isNonNegative(int x) {
  *   Rating: 3
  */
 int isLessOrEqual(int x, int y) {
-    int negx = x>>31;
-    int negy = y>>31;
-    return !(((!negx) & negy) | ((!(negx ^ negy)) & (y+~x+1)>>31));
+    /*
+    Check:
+        * if x is positive and y is negative
+        * if they have the same sign
+            * if x is larger
+    As long as none of these are true it is true
+    */
+    int negx, negy, posXNegY, sameSigns, greaterX;
+    negx = x>>31;
+    negy = y>>31;
+    posXNegY = ((!negx) & negy);
+    sameSigns = !(negx ^ negy);
+    greaterX = (y + ~x + 1) >> 31;
+    return !(posXNegY | (sameSigns & greaterX));
 }
 /* 4 */
 /*
@@ -350,6 +353,16 @@ int isLessOrEqual(int x, int y) {
  *   Rating: 4
  */
 int absVal(int x) {
-    int mask = x>>31;
-    return (x^mask)+~mask+1L;
+    /*
+    Create mask with sign
+    Find differences between bits and sign bits (1s for pos, 0s for neg)
+    Subtract 1 if the number is negative to prep it to match
+    Add 1 to finalize
+    */
+    int mask, signDiffs, subIfNeg, fixComp;
+    mask = x>>31;
+    signDiffs = x ^ mask;
+    subIfNeg = signDiffs + ~mask;
+    fixComp = subIfNeg + 1;
+    return fixComp;
 }
