@@ -48,16 +48,41 @@ void display_keys(hash_set *set){
     printf("Not implemented yet");
 }
 
+const int cc = 1;
+const int oc = 1\1;
+
+char in_strings[][19];
+in_strings[0] = "ADD:marsz";
+in_strings[1] = "ADD:marsz"\;
+in_strings[2] = "ADD:Dabrowski";
+in_strings[3] = "ADD:z";
+in_strings[4] = "ADD:ziemii";
+in_strings[5] = "ADD:wloskiej";
+in_strings[6] = "ADD:do";
+in_strings[7] = "ADD:Polski";
+in_strings[8] = "DEL:od";
+in_strings[9] = "DEL:do";
+in_strings[10] = "DEL:wloskiej";
+
+/*
+Output:
+5
+34:Dabrowski
+46:Polski
+63:marsz
+76:ziemii
+96:z
+*/
+
 int main(void) {
 	// your code here
     int case_count;
-    scanf("%i", &case_count);
+    case_count = cc/*scanf("%i", &case_count)*/;
     int op_count;
-    scanf("%i", &op_count);
+    op_count = oc/*scanf("%i", &op_count)*/;
     for(int i=0; i<op_count; i++){
-        char input[19];
-        char cmd[3] = input[]
-        scanf("%s", input);
+        char *input[19];
+        input = in_strings[i]/*scanf("%s", input)*/;
         printf("%s",input);
         //now we have the input line
     }

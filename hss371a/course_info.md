@@ -30,3 +30,8 @@ Some topics we'll cover
 > "You only have on chance (per person) to get fresh eyes on something, that's pretty valuable"
 
 > "There's no preliminary reading for this class. We just met, I didn't want to be so forward."
+
+## Cheatsheets and partners
+1 double sided typed page of notes is allowed for tests and Quizzes.
+
+Quizzes are usually done in pairs.
