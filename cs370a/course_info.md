@@ -23,4 +23,4 @@ Lecture: M 6:15pm-8:45pm in P 120
 ## General notes
 * 190 students this semester (110 115) so CAs first
 * Think of the course as algorithms 2
-* **If you can't get an answer** - write up excuses files showin what you did and tried and what didn't work and where you think you would go next, then that gets graded. Mainly just explain your thought process and what happened. (Include test cases, especially to show how it passes yours but still not online)
+* **If you can't get an answer** - write up excuses files showing what you did and tried and what didn't work and where you think you would go next, then that gets graded. Mainly just explain your thought process and what happened. (Include test cases, especially to show how it passes local tests but not online judge)

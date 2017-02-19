@@ -1,128 +1,113 @@
 /******************************************************************************
  * Name        : HashIt.c
  * Authors     : Noel Smith, Thomas Haumersen, Joshua Gribbon
- * Version     : 1.0
- * Date        : February 6, 2017
+ * Version     : 1.1
+ * Date        : February 12, 2017
  * Description : Solution to Spoj problem: HASHIT
  * Pledge      : I pledge my honor that I have abided by the Stevens Honor System.
  ******************************************************************************/
 
- /* PLAN
-	1. Parse, seperate commands and arguments
-	2. Develop methods to handle operations
-	3. Connect methods and operations
- */
-
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 
 #define TABLE_SIZE 101
 
-/*
- * The set of keys
-*/
+// the set of keys
 typedef struct {
-	char* keys[TABLE_SIZE];
+	char *keys[TABLE_SIZE];
 	int num_keys;
 } hash_set;
 
-void clear_table(hash_set *set){
-	for(int i = 0; i < TABLE_SIZE; i++){
-		if(set->keys[i] != 0){
-			free(set->keys[i]);
-			set->keys[i] = 0;
-		}
-	}
-}
 
-int hash(char* key){
+//base hash function. turns string into a hash value
+int hash(char *key) {
+	int i;
 	int sum = 0;
-	int n = 1;
-	while(key[n-1] != '\0'){
-		sum += n*((int)key[n-1]);
-		n++;
+
+	for (i = 0; key[i]; i++) {
+		sum += key[i] * (i + 1);
 	}
-	return sum * 19;
+
+	return 19 * sum % TABLE_SIZE;
 }
 
-int insert_key(hash_set *set, char *key){
+//sets all pointers to 0 and frees strings
+void clear_table(hash_set *hs) {
+	hs->num_keys = 0;
+	for (int i = 0; i < TABLE_SIZE; i++) {
+		if (hs->keys[i] != 0) {
+			free(hs->keys[i]);
+			hs->keys[i] = 0;
+		}
+	}
+}
+
+
+//creates a copy of key and inserts it into hash set, if it isnt a duplicate
+void insert_key(hash_set *hs, char *key) {
 	int h = hash(key);
-
-	if(set->num_keys == TABLE_SIZE)
-		return -1;
-
-	for(int j = 0; j <= 20; j++){
-		int i = (h+j*j + 23*j) % 101;
-
-		//dont add repetitive key
-		if(set->keys[i] != 0 && strcmp(set->keys[i],key) == 0){
-			return -2;
-		}
-
-		if(set->keys[i] == 0){
-			set->keys[i] = malloc(sizeof(char)*15);
-			memcpy(set->keys[i], key, strlen(key) +1);
-			set->num_keys++;
-			return i;
+	//check for duplicate key
+	for (int i = 0; i < TABLE_SIZE; i++) {
+		if (hs->keys[i] != 0 && strcmp(hs->keys[i], key) == 0) {
+			return;
 		}
 	}
-	return -1;
+
+	//tries inserting
+	for (int i = 0; i < 20; i++) {
+		int pos = (h + i * i + 23 * i) % TABLE_SIZE;
+		if (hs->keys[pos] == 0) {
+			hs->keys[pos] = (char *) malloc(sizeof(char) * 16);
+			strcpy(hs->keys[pos], key);
+			hs->num_keys++;
+			break;
+		}
+	}
 }
 
-int delete_key(hash_set *set, char *key){
+//removes the key from the hash set if it exists
+void delete_key(hash_set *hs, char *key) {
 	int h = hash(key);
-
-	for(int j = 0; j < 20; j++){
-		int i = (h+j*j + 23*j) % 101;
-		if(set->keys[i] != 0 && strcmp(set->keys[i],key) == 0){
-			free(set->keys[i]);
-			set->keys[i] = 0;
-			set->num_keys--;
-			return i;
-		}
-	}
-	return -1;
-}
-
-void display_keys(hash_set *set){
-	printf("%d\n",set->num_keys);
-
-	for(int i = 0; i < TABLE_SIZE; i++){
-		if(set->keys[i] != 0){
-			printf("%d:%s\n",i,set->keys[i]);
+	for (int i = 0; i < 20; i++) {
+		int pos = (h + i * i + 23 * i) % TABLE_SIZE;
+		if (hs->keys[pos] != 0 && strcmp(hs->keys[pos], key) == 0) {
+			free(hs->keys[pos]);
+			hs->keys[pos] = 0;
+			hs->num_keys--;
+			break;
 		}
 	}
 }
 
-int main(void) {
-	// your code here
-	hash_set* hs = (hash_set*) calloc(1,sizeof(hash_set));
-
-	clear_table(hs);
-
-	int case_count;
-	scanf("%d", &case_count);
-
-	int op_count;
-	scanf("%d", &op_count);
-	for(int j = 0; j < case_count; j++){
-		for(int i=0; i<op_count; i++){
-			char input[19];
-			scanf("%s", &input);
-			if(strncmp("ADD:",input,4) == 0){
-				insert_key(hs,input+4);
-			}
-			else{
-				//del
-				delete_key(hs,input+4);
-			}
-			//now we have the input line
+//displays info about the hash set
+void display_keys(hash_set *hs){
+	printf("%d\n", hs->num_keys);
+	for (int i = 0; i < TABLE_SIZE; i++) {
+		if (hs->keys[i] != 0) {
+			printf("%d:%s\n", i, hs->keys[i]);
 		}
+	}
+}
 
-		display_keys(hs);
+
+int main() {
+	int t, n;
+	hash_set *hs = (hash_set *) calloc(1, sizeof(hash_set));
+	scanf("%d", &t);
+	while (t--) {
 		clear_table(hs);
+		scanf("%d", &n);
+		for (int i = 0; i < n; i++) {
+			char operation[4], key[17];
+			scanf("%3s:%s", operation, key);
+			if (!strcmp(operation, "ADD")) {
+				insert_key(hs, key);
+			} else {
+				delete_key(hs, key);
+			}
+		}
+		display_keys(hs);
 	}
-
 	return 0;
 }
