@@ -1,11 +1,10 @@
 (module interp (lib "eopl.ss" "eopl")
-  
+
   ;; interpreter for the LET language.  The \commentboxes are the
   ;; latex code for inserting the rules into the code in the book.
   ;; These are too complicated to put here, see the text, sorry.
 
   (require "drscheme-init.scm")
-
   (require "lang.scm")
   (require "data-structures.scm")
   (require "environments.scm")
@@ -16,7 +15,7 @@
 
   ;; value-of-program : Program -> ExpVal
   ;; Page: 71
-  (define value-of-program 
+  (define value-of-program
     (lambda (pgm)
       (cases program pgm
         (a-program (exp1)
@@ -50,7 +49,7 @@
               (if (zero? num1)
                 (bool-val #t)
                 (bool-val #f)))))
-              
+
         ;\commentbox{\ma{\theifspec}}
         (if-exp (exp1 exp2 exp3)
           (let ((val1 (value-of exp1 env)))
@@ -59,39 +58,53 @@
               (value-of exp3 env))))
 
         ;\commentbox{\ma{\theletspecsplit}}
-        (let-exp (var exp1 body)       
+        (let-exp (var exp1 body)
           (let ((val1 (value-of exp1 env)))
             (value-of body
               (extend-env var val1 env))))
 
         ;; Extensions follow
         (minus-exp (exp1)
-                       (write "implement me!"))
+                   (num-val (-
+                       0
+                       (expval->num (value-of exp1 env)))))
 
         (add-exp (exp1 exp2)
-                       (write "implement me!"))
+                 (num-val (+
+                     (expval->num (value-of exp1 env))
+                     (expval->num (value-of exp2 env)))))
 
         (mult-exp (exp1 exp2)
-                       (write "implement me!"))
+                 (num-val (*
+                     (expval->num (value-of exp1 env))
+                     (expval->num (value-of exp2 env)))))
 
         (div-exp (exp1 exp2)
-                       (write "implement me!"))
+                 (num-val (/
+                     (expval->num (value-of exp1 env))
+                     (expval->num (value-of exp2 env)))))
 
         (cons-exp (exp1 exp2)
-                       (write "implement me!"))
+                  (list-val (list
+                      (num-val  (expval->num  (value-of exp1 env)))
+                      (list-val (expval->list (value-of exp2 env))))))
 
         (car-exp (e1)
-                       (write "implement me!"))
+                  (car
+                      (expval->num (value-of e1 env))))
 
         (cdr-exp (e1)
-                       (write "implement me!"))
-                 
+                   (list-val
+                       ((expval->list (value-of e1 env)))))
+
         (null-exp (exp1)
-                       (write "implement me!"))
-      
+                   (bool-val (null?
+                       (expval->list (value-of exp1 env)))))
+
         (emptylist-exp ()
-                       (write "implement me!"))
+                    (list-val(list)))
 
-
+      )
+    )
   )
-
+)
