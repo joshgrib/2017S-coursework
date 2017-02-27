@@ -1,3 +1,9 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Josh Gribbon                   ;;
+;; Homework 3                     ;;
+;; 2017-02-24                     ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (module interp (lib "eopl.ss" "eopl")
 
   ;; interpreter for the LET language.  The \commentboxes are the
@@ -65,44 +71,44 @@
 
         ;; Extensions follow
         (minus-exp (exp1)
-                   (num-val (-
-                       0
-                       (expval->num (value-of exp1 env)))))
+            (num-val (-
+               0
+               (expval->num (value-of exp1 env)))))
 
         (add-exp (exp1 exp2)
-                 (num-val (+
-                     (expval->num (value-of exp1 env))
-                     (expval->num (value-of exp2 env)))))
+            (num-val (+
+                (expval->num (value-of exp1 env))
+                (expval->num (value-of exp2 env)))))
 
         (mult-exp (exp1 exp2)
-                 (num-val (*
-                     (expval->num (value-of exp1 env))
-                     (expval->num (value-of exp2 env)))))
+            (num-val (*
+                (expval->num (value-of exp1 env))
+                (expval->num (value-of exp2 env)))))
 
         (div-exp (exp1 exp2)
-                 (num-val (/
-                     (expval->num (value-of exp1 env))
-                     (expval->num (value-of exp2 env)))))
+            (num-val (/
+                (expval->num (value-of exp1 env))
+                (expval->num (value-of exp2 env)))))
 
         (cons-exp (exp1 exp2)
-                  (list-val (list
-                      (num-val  (expval->num  (value-of exp1 env)))
-                      (list-val (expval->list (value-of exp2 env))))))
+            (list-val (list
+                (num-val  (expval->num  (value-of exp1 env)))
+                (list-val (expval->list (value-of exp2 env))))))
 
         (car-exp (e1)
-                  (car
-                      (expval->num (value-of e1 env))))
+            (car
+                (expval->num (value-of e1 env))))
 
         (cdr-exp (e1)
-                   (list-val
-                       ((expval->list (value-of e1 env)))))
+            (list-val
+                ((expval->list (value-of e1 env)))))
 
         (null-exp (exp1)
-                   (bool-val (null?
-                       (expval->list (value-of exp1 env)))))
+            (bool-val (null?
+                (expval->list (value-of exp1 env)))))
 
         (emptylist-exp ()
-                    (list-val(list)))
+            (list-v al(list)))
 
       )
     )
