@@ -63,6 +63,30 @@ U~max~ = 2*T~max~+1
 **Negation** can be done by complementing and incrementing
 
 ### Memory
+Conceptually a large array of bytes, each with an index that a pointer can be assigned to.
+
+> Note: system provides private address spaces to each process, so they can't corrupt each other's data.
+
+Computers have a **Word Size** that is the size of integer data and addresses on the machine. 32 bits (4 bytes) used to be common, but that limits addressable memory to 4GB. 64 bit is now increasingly common (up to 18 exabytes of addressable memory).
+Machines also support data formats not conforming to the word size by using fractions or multiples of the word size, but there is always an integer amount of bytes.
+
+**Byte Ordering**:
+* *Big Endian* - least significant byte has highest address
+    *Sun, PPC Man, Internet
+* *Little Endian* - least significant byte has lowest address
+    * x86, most computers
+
+### C Pointers
+A `pointer*` gets assigned to the `&address` of a `variable`
+```c
+int a = 1234; //assign variable
+int *p = &a;  //assign pointer to address
+```
+
+The address shows where to start to look, and the type(`int`, `long`, etc) says how far to go and how to interpret what is in that space.
+
+### C Strings
+An array of characters, encoded in ASCII standard 7 bit encoding of character set, null-terminated with a final character of 0 (0x30).
 
 ## 06 - Machine Level Programming: Basics
 
