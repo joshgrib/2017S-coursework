@@ -204,30 +204,223 @@ Assembly code **operands** are the inputs that tell that code what data to use f
         > `Mem[0x1e080]`
 
 ### Arithmetic and Logical Operations
-* `leaq <src> <dest>` - load effective address - `dest` = address of `src`, useful for shift+add operation
-    * `leaq (%rdi, %rdi, 2), %rax` means `%rax` = `%rdi` + `%rdi*2`
-    * `leaq (%rdi, %rdi, 2), %rax` means `%rax` = `%rdi` + `%rdi*2`
 
-Command|Meaning|Note
-:--|:--|:--
-`leadq <src> <dst>`| `dst`=addressOf(`src`)
-`addq <src> <dest>`| `dest`=`dest`+`src`|Add
-`subq <src> <dest>`| `dest`=`dest`-`src`|Subtract
-`imulq <src> <dest>`| `dest`=`dest`x`src`|Signed Integer Multiply
-`salq <src> <dest>`| `dest`=`dest`<<`src`|Shift arithmetic left (=`shlq`)
-`sarq <src> <dest>`| `dest`=`dest`>>`src`|Shift arithmetic right
-`shrq <src> <dest>`| `dest`=`dest`>>`src`|Shift logical right
-`xorg <src> <dest>`| `dest`=`dest` `src`|Logical exclusive or
-`andq <src> <dest>`| `dest`=`dest` `src`|Logical and
-`orq <src> <dest>`| `dest`=`dest` `src`|Logical or
-`incq <dest>`| `dest` = `dest`+1|Increment
-`decq <dest>`| `dest` = `dest`-1|Decrement
-`negq <dest>`| `dest` = -`dest`|Negate(two-complement)
-`notq <dest>`| `dest` = ~`dest`|Logical not
+-   `leaq <src> <dest>` - load effective address - `dest` = address of `src`, useful for shift+add operation
+    -   `leaq (%rdi, %rdi, 2), %rax` means `%rax` = `%rdi` + `%rdi*2`
+    -   `leaq (%rdi, %rdi, 2), %rax` means `%rax` = `%rdi` + `%rdi*2`
+
+| Command              | Meaning                    | Note                            |
+| :------------------- | :------------------------- | :------------------------------ |
+| `leadq <src> <dst>`  | `dst`=addressOf(`src`)     |                                 |
+| `addq <src> <dest>`  | `dest`=`dest`+`src`        | Add                             |
+| `subq <src> <dest>`  | `dest`=`dest`-`src`        | Subtract                        |
+| `imulq <src> <dest>` | `dest`=`dest`x`src`        | Signed Integer Multiply         |
+| `salq <src> <dest>`  | `dest`=`dest`&lt;&lt;`src` | Shift arithmetic left (=`shlq`) |
+| `sarq <src> <dest>`  | `dest`=`dest`>>`src`       | Shift arithmetic right          |
+| `shrq <src> <dest>`  | `dest`=`dest`>>`src`       | Shift logical right             |
+| `xorg <src> <dest>`  | `dest`=`dest` `src`        | Logical exclusive or            |
+| `andq <src> <dest>`  | `dest`=`dest` `src`        | Logical and                     |
+| `orq <src> <dest>`   | `dest`=`dest` `src`        | Logical or                      |
+| `incq <dest>`        | `dest` = `dest`+1          | Increment                       |
+| `decq <dest>`        | `dest` = `dest`-1          | Decrement                       |
+| `negq <dest>`        | `dest` = -`dest`           | Negate(two-complement)          |
+| `notq <dest>`        | `dest` = ~`dest`           | Logical not                     |
 
 ## 07 - Machine-Level Programming: Control
 
+**Processor state** and register usage
+
+-   Temporary data = (`%rax`, ...)
+-   Location of runtime stack = (`%rsp`)
+-   Location of current code control point = (`%rip`, ...)
+-   Status of recent tests = (`CF`, `ZF`, `SF`, `OF`)
+    ### Conditional codes
+-   **`CF`** - carry flag (for unsigned)
+-   **`SF`** - sign flag (for signed)
+-   **`ZF`** - zero flag
+-   **`OF`** - overflow flag (for signed)
+
+**Can by ==set implicitly by using arithmetic operations== (notably not `leaq`)**
+Example: `addq <src> <dest> = <res>`
+
+-   CF set for unsigned overflow
+-   ZF set if <res> == 0
+-   SF set if <res> &lt; 0, marked as signed
+-   OF set for signed overflow with two's complement
+
+**Can be ==set explicitly by comparison==**
+Example: `cmpq <b> <a>` is like doing `a-b` without setting a destination
+
+-   CF set if carry on most significant bit
+-   ZF set if `b`==`a`
+-   SF set if (`a`-`b`)&lt;0 as signed
+-   OF set for two's complement overflow
+      `(a>0 && b<0 && (a-b)<0) || (a<0 && b>0 && (a-b)>0)`
+
+**Can be ==set explicitly by test==**
+Example: `testq <b>, <a>` is like doing `a&b` without setting destination, good for using one as a mask and getting flag values
+
+-   ZF set if `a&b==0`
+-   SF set if `a&b<0`
+
+#### Reading condition codes
+
+**SetX Commands** set the low-order byte of the destination to be 0 or 1 based on combination of condition codes, does not alter other 7 bytes
+
+| Name           | Condition              | Description               |
+| :------------- | :--------------------- | :------------------------ |
+| `sete <dest>`  | `ZF`                   | Equal/ zero               |
+| `setne <dest>` | ~`ZF`                  | Not equal/ not zero       |
+| `sets <dest>`  | `SF`                   | Negative                  |
+| `setns <dest>` | ~`SF`                  | Nonnegative               |
+| `setg <dest>`  | ~(`SF`^`OF`) AND ~`ZF` | Greater(signed)           |
+| `setge <dest>` | ~(`SF`^`OF`)           | Greater or equal (signed) |
+| `setl <dest>`  | (`SF`^`OF`)            | Less (signed)             |
+| `setle <dest>` | (`SF`^`OF`) OR `ZF`    | Less of equal (signed)    |
+| `seta <dest>`  | ~`CF` AND ~`ZF`        | Above (unsigned)          |
+| `setb <dest>`  | `CF`                   | Below (unsigned)          |
+
+Usually `movzbl` is often then used to fill the rest of the number
+
+```c
+cmpq    %rsi,   %rdi    // Compare x to y
+setg    %rax            // Set when >
+movzbl  %rax,    %eax   // Zero rest of %rax
+```
+
+### Conditional branches
+
+**Jumping** can be done through ==jX instructions==, which jump depending on codition codes
+
+| Name        | Condition              | Description               |
+| :---------- | :--------------------- | :------------------------ |
+| `jpm <loc>` | 1                      | Unconditional             |
+| `je <loc>`  | `ZF`                   | Equal/ zero               |
+| `jne <loc>` | ~`ZF`                  | Not equal/ not zero       |
+| `js <loc>`  | `SF`                   | Negative                  |
+| `jns <loc>` | ~`SF`                  | Nonnegative               |
+| `jg <loc>`  | ~(`SF`^`OF`) AND ~`ZF` | Greater(signed)           |
+| `jge <loc>` | ~(`SF`^`OF`)           | Greater or equal (signed) |
+| `jl <loc>`  | (`SF`^`OF`)            | Less (signed)             |
+| `jle <loc>` | (`SF`^`OF`) OR `ZF`    | Less of equal (signed)    |
+| `ja <loc>`  | ~`CF` AND ~`ZF`        | Above (unsigned)          |
+| `jb <loc>`  | `CF`                   | Below (unsigned)          |
+
+#### Goto Statements
+
+Available in C to jump to location by label
+
+#### Conditional Move
+
+Changing control flow can be expensive so sometimes it's better to compute both options for branch and then test and condition and return the appropriate value. This works well for simple stuff but can get weird for complex stuff because both sides might get run.
+
+### Loops
+
+**Do-while**
+Set loop tag at beginning, then decide if you should jump back to the beginning when you get to the bottom. At the end of each loop it will repeat as long as the condition is true.
+
+```c
+loop:
+    ...
+if(test):
+    goto loop
+```
+
+**While**
+To test before running, start with an instruction to jump to the test at the bottom of the loop, if it's true you enter the loop if not you carry on from there. Alternatively just check for test falsehood right before the loop and jump over it if it's not needed.
+
+```c
+goto test           |if(!test):
+loop:               |    goto done
+    {...}           |loop:
+test:               |    {...}
+    if(test):       |if(test)
+        goto loop   |    goto loop   
+                    |done:
+```
+
+**For**
+Just a `while` where you reassign values used for the test
+
+### Switch Statements
+
+Large switch statements use jump tables
+Small switch statements may use decision trees
+![placecage](http://www.placecage.com/c/300/200)
+Switch statements seem pretty complicated in assembly.
 
 ## 08 - Machine-Level Programming: Procedures
 
+**Mechanisms of procedures**
+
+-   Pass control
+-   Pass data
+-   Memory management
+
+### Stack Structure
+
+Stack bottom is at higher addresses, growing toward lower addresses. `%rsp` has the stack top address.
+
+**Operations**
+
+-   `pushq <src>` takes `src`, decrements `%rsp` by 8, then writes `src` into the new location of `%rsp`
+-   `popq <dest>` takes the value currently at `%rsp`, increments `%rsp` by 8, then stores the value in `dest`
+
+### Calling conventions
+
+#### Passing control
+
+`callq <label>` = Call procedure: push the return address on to the stack, jump to `label`
+The ==return address is the address of the next instruction after the call==.
+
+`ret` = return from procedureL pop address from stack and go to it
+
+#### Passing data
+
+-   Registers hold first 6 arguments
+-   Stack
+-   Return value
+
+Different conventions pass in data on different registers.
+We used the `System V AMD64 ABI` convention, which is used on most unix systems. ==In this convention arguments are passed in on `RDI`, `RSI`, `RDX`, `RCX`, `R8`, `R9`, and then the stack.==
+
+#### Managing local data
+
+For recursion and in general it's useful to split the stack into regions. ==A stack frame is a section of the stack holding state for a given procedure instantiation.==
+
+**Stack Frames**
+
+-   Return information
+-   Local storage if needed
+-   Temporary space if needed
+
+### Misc
+
+-   Stack frames give each function call private storage
+    -   Save registers, local variables, return pointer
+-   Register saving conventions prevent functions corrupting each other's data
+-   Stack management pattern matches call/return pattern
+    -   P calls Q, Q returns before P, last-in first-out
+
 ## 09 - Machine-Level Programming: Data
+
+### Arrays
+
+Generally just a section of memory with enough room to fit the data for each element in the array.
+2D arrays are arrays of arrays, just a longer block on memory.
+
+Use index arithmetic to access elements,
+
+### Structures
+
+==A structure is a block of memory big enough to hold all the fields.== Fields are ordered according to declaration, compiler determines overall size and position of fields.
+
+**Linked list** is a list of structures where each has a data value and a pointer to the next one
+`struct rec {int a[4]; size_t i; struct rec *next}`
+
+#### Data alignment
+
+In **unaligned data** all data members are directly next to each other in memory with no extra space.
+
+In **aligned data** we fit data to be a multiple of a primitive data type size. This is required on some machines and advised on others.
+Aligned data can be easier to reference by knowing data will start at common places. The compiler adds gaps in the structure to align the fields.
