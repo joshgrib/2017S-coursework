@@ -1,6 +1,8 @@
-# Systems Programming
+# Systems Programming - Bits to Machine Code
 
-Midterms "test your understanding of the concepts and the mathematical principles".
+Midterm will "test your understanding of the concepts and the mathematical principles".
+
+
 
 ## 01-overview.pdf
 
@@ -211,7 +213,7 @@ Assembly code **operands** are the inputs that tell that code what data to use f
 
 | Command              | Meaning                    | Note                            |
 | :------------------- | :------------------------- | :------------------------------ |
-| `leadq <src> <dst>`  | `dst`=addressOf(`src`)     |                                 |
+| `leadq <src> <dst>`  | `dst`=addressOf(`src`)     | Load effective address          |
 | `addq <src> <dest>`  | `dest`=`dest`+`src`        | Add                             |
 | `subq <src> <dest>`  | `dest`=`dest`-`src`        | Subtract                        |
 | `imulq <src> <dest>` | `dest`=`dest`x`src`        | Signed Integer Multiply         |
@@ -346,7 +348,6 @@ Just a `while` where you reassign values used for the test
 
 Large switch statements use jump tables
 Small switch statements may use decision trees
-![placecage](http://www.placecage.com/c/300/200)
 Switch statements seem pretty complicated in assembly.
 
 ## 08 - Machine-Level Programming: Procedures
