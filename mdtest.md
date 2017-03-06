@@ -47,18 +47,26 @@ $$
 | Pipe      |    1 USD | 234  |
 
 ## Graphs as links
-<img src='http://g.gravizo.com/svg?
- digraph G {
-   main -> parse -> execute;
-   main -> init;
-   main -> test;
-   execute -> make_string;
-   execute -> printf
-   init -> make_string;
-   main -> printf;
-   execute -> compare;
- }
-'/>
+
+**SVG output** it's ready. Only need to replace https://g.gravizo.com/g? by https://g.gravizo.com/svg? and https://g.gravizo.com/source? by https://g.gravizo.com/source/svg?
+
+![Alt text](https://g.gravizo.com/svg?
+  digraph G {
+    aize ="4,4";
+    main [shape=box];
+    main -> parse [weight=8];
+    parse -> execute;
+    main -> init [style=dotted];
+    main -> cleanup;
+    execute -> { make_string; printf};
+    init -> make_string;
+    edge [color=red];
+    main -> printf [style=bold,label="100 times"];
+    make_string [label="make a string"];
+    node [shape=box,style=filled,color=".7 .3 1.0"];
+    execute -> compare;
+  }
+)
 
 ![Alt text](https://g.gravizo.com/svg?
   digraph G {
@@ -80,6 +88,19 @@ $$
 
 
 ## Graphs (require packages)
+
+<img src='http://g.gravizo.com/svg?
+ digraph G {
+   main -> parse -> execute;
+   main -> init;
+   main -> test;
+   execute -> make_string;
+   execute -> printf
+   init -> make_string;
+   main -> printf;
+   execute -> compare;
+ }
+'/>
 
 ```{mermaid}
 %% Example diagram
