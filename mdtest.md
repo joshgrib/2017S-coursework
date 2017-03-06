@@ -56,7 +56,26 @@ $$
 
 > These graphs and stuff are made from a request to an API that makes them. I was kinda stuck between this and the ones below, but they use a bunch of the same things, and these can be rendered on github.
 
-![Alt text](<https://g.gravizo.com/svg?
+This code:
+```html
+![Alt text](https://g.gravizo.com/svg?
+    digraph G {
+        a -> b;
+    })
+
+```
+Makes this graph:
+
+![Alt text](https://g.gravizo.com/svg?
+    digraph G {
+        a -> b;
+    })
+
+### Examples
+
+#### With the DOT language
+
+![Alt text](https://g.gravizo.com/svg?
   digraph G {
     aize ="4,4";
     main [shape=box];
@@ -71,9 +90,9 @@ $$
     make_string [label="make a string"];
     node [shape=box,style=filled,color=".7 .3 1.0"];
     execute -> compare;
-  }>)
+  })
 
-![Alt text](<https://g.gravizo.com/svg?
+![Alt text](https://g.gravizo.com/svg?
     graph G {
 		rankdir=LR;
 		a -- { b c d }; b -- { c e }; c -- { e f }; d -- { f g }; e -- h;
@@ -86,8 +105,8 @@ $$
 		{ rank=same, l, m, n }
 		{ rank=same, o, p, q, r }
 		{ rank=same, s, t }
-	}>)
-![Alt text](<https://g.gravizo.com/svg?
+	})
+![Alt text](https://g.gravizo.com/svg?
     digraph G {
         a -> b -> c;
         b -> d;
@@ -95,7 +114,7 @@ $$
         c [shape=polygon,sides=4,skew=.4,label="hello world"]
         d [shape=invtriangle];
         e [shape=polygon,sides=4,distortion=.7];
-    }>)
+    })
 
 ![Alt text](<https://g.gravizo.com/svg?
     digraph g {
@@ -119,6 +138,31 @@ $$
         "node4":f0 -> "node5":f1;
     }
 )
+
+#### WIth [PlantUML](http://plantuml.com/state-diagram)
+
+![Alt text](https://g.gravizo.com/svg?{
+    @startuml;
+    [\*] --> State1:Begin;
+    State1 --> [\*]:End;
+    State1 : this is a string;
+    State1 : this is another string;
+    State1 -> State2;
+    State2 --> [\*]:End;
+    @enduml
+})
+
+![Alt text](https://g.gravizo.com/svg?{
+    @startuml;
+    [\*] -up-> First;
+    First -right-> Second;
+    Second --> Third;
+    note right of Second: Hey there;
+    Third -left-> Last;
+    note "Float note" as n0;
+    @enduml;
+})
+
 
 ## Old Graphs
 
