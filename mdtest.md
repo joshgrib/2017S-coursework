@@ -46,7 +46,22 @@ $$
 | Phone     |   12 USD |  12  |
 | Pipe      |    1 USD | 234  |
 
+## Graphs as links
+<img src='http://g.gravizo.com/g?
+ digraph G {
+   main -> parse -> execute;
+   main -> init;
+   main -> test;
+   execute -> make_string;
+   execute -> printf
+   init -> make_string;
+   main -> printf;
+   execute -> compare;
+ }
+'/>
 
+
+## Graphs (require packages)
 
 ```{mermaid}
 %% Example diagram

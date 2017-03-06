@@ -11,6 +11,9 @@ let g = let count = 0
         begin set count = -(count ,-1);
             count
         end
+<!-- toc orderedList:0 depthFrom:1 depthTo:6 -->
+<!-- tocstop -->
+
 in -((g 11), (g 22))
 ```
 
