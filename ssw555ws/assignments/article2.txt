@@ -1,0 +1,14 @@
+URL:
+https://en.wikipedia.org/wiki/The_Mythical_Man-Month
+
+Description:
+This is the wiki page for the book "The Mythical Man-Month" by Fred Brooks, published in 1975, and well known for covering "the human elements of software engineering". Below are some of the main points from the book.
+* The mythical man-month: The size of a team will effect their output, so you cannot accurately measure a project as people*hours because it doesn't scale proportionately. Moreso it takes time to get people up to speed, so adding people to a late project will make it later.
+* The second system effect: new systems are the most prone to over-engineering
+* Progress tracking: progress cannot accurately be tracked on a large scale, so continually meeting small individual goals is key. (This fits well with the agile concept of assigned tasks within the sprint).
+* Conceptual integrity: systems need to make sense conceptually to be user-friendly. It's often better to leave out possible features if they don't fit well or will over-complicate things. ("Worse is better"/"New Jersey style" - less features and more simplicity is better)
+* The surgical team: A project should have a lead programmer who is skilled to handle big things, with a team to assist as needed.
+* Code freeze and system versioning: Because software isn't a physical object it can be in constant flux, so there much be set versions to assess and make changes based on.
+
+Recommendation:
+I'd definitely recommend reading the article. It's a summary of a kinda iconic book so you can see the main insights without reading the whole thing, and then if you're really interested you can do the whole book. This fits pretty well with the course content as it discusses the team dynamics behind software development.
