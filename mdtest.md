@@ -47,7 +47,7 @@ $$
 | Pipe      |    1 USD | 234  |
 
 ## Graphs as links
-<img src='http://g.gravizo.com/g?
+<img src='http://g.gravizo.com/svg?
  digraph G {
    main -> parse -> execute;
    main -> init;
@@ -60,7 +60,7 @@ $$
  }
 '/>
 
-![Alt text](https://g.gravizo.com/g?
+![Alt text](https://g.gravizo.com/svg?
   digraph G {
     aize ="4,4";
     main [shape=box];
