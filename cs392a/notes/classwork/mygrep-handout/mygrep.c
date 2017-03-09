@@ -61,17 +61,78 @@ static int parse_arguments(int argc, char **argv)
 /* Return 0 if line matches or -1 otherwise */
 static int line_matches(const char *line, const char *sstr)
 {
+    // find first match
+    char *line_p;
+    for(line_p=line; *line_p!='\0'; line_p++){
+        if(*line_p == *sstr){
+            printf("Checking for '%s' in '%s'", sstr, line);
+            break;
+            char *sstr_p;
+            for(sstr_p=sstr; *sstr_p!='\0'; sstr_p++){
+                printf("Checking char matches: %s to %s", *line_p, *sstr_p);
+            }
+        }
+    }
+    //check the rest of the strings for a match
+    // doesn't this not catch matches after the first char found?
+    //  ex: "bits" in "bacon and bits" wouldn't be found, break on "b", no match, end
+
+
+    //no match, at end of line
+    if(line_p=='\0'){
+        return 0;
+    }
+    /*
+    iterate over line:
+        * look for sstr[0], check if the next len(sstr)-1 chars in the line are
+          equal to sstr
+        * if equal return true
+        * if not equal continue search in line
+        * if at end of line return false
+    characters to look for match for search char 0
+    check if rest of search string is there
+    */
 	return -1;
 }
 
 /* Search for string sstr in input read from in */
 static int search_string(FILE *in, const char *sstr)
 {
+    int r = 0;
+    size_t llen = 0;
+    char *line = NULL;
+    unsigned long sstr_matches = 0;
+
+    while((r = getline(&line, &llen, in)) > 0){
+        if(line_matches(line, sstr) != 0)
+            continue;
+        sstr_matches++;
+        if(!g_count_only){
+            if(fwrite(line, 1, r, stdout) != r){
+                perror("write error");
+                r = -1;
+                break;
+            }
+        }
+    }
+    if(line)
+        free(line);
+    if(r != EOF){
+        perror("read error");
+        return -1;
+    }
+    if(g_count_only)
+        printf("%i", g_count_only);
 	return 0;
 }
 
 int main(int argc, char **argv)
 {
+    printf("\n");
+    printf("+-----------+\n");
+    printf("|  Running  |\n");
+    printf("+-----------+\n");
+
 	FILE *fin = stdin;
 	int rval  = 0;
 
