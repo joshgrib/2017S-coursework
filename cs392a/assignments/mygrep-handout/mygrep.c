@@ -5,11 +5,12 @@
 #include <errno.h>
 
 
-#define OPTS "hcf:"
+#define OPTS "hcif:"
 #define OPTS_HELP \
 " Options:\n"\
 "  -f <file>   Read data from file instead of standard input\n"\
 "  -c          Only count how many lines matched.\n"\
+"  -i          Ignore case.\n"\
 "  -h          Print this help message\n"
 
 /* Globals for command line options */
@@ -17,6 +18,7 @@ static int g_count_only = 0; /* Count lines only */
 static char *g_search_string = NULL; /* String i'm searching for */
 /* Read input from this file, instead of stdin */
 static char *g_infilename = NULL;
+static int g_ignore_case = 0;/*Ignore case of letters*/
 
 
 /* Print usage information */
@@ -35,6 +37,9 @@ static int parse_arguments(int argc, char **argv)
 		case 'c':
 			g_count_only = 1;
 			break;
+        case 'i':
+            g_ignore_case = 1;
+            break;
 		case 'f':
             //optarg is globally assigned when calling getopt
 			g_infilename = optarg;
@@ -65,33 +70,28 @@ static int line_matches(const char *line, const char *sstr)
     char *line_p;
     for(line_p=line; *line_p!='\0'; line_p++){
         if(*line_p == *sstr){
-            printf("Checking for '%s' in '%s'", sstr, line);
-            break;
+            //printf("\nChecking for '%s' in: %s", sstr, line);
+            //break;
             char *sstr_p;
+            char *line_p_cp = line_p;
             for(sstr_p=sstr; *sstr_p!='\0'; sstr_p++){
-                printf("Checking char matches: %s to %s", *line_p, *sstr_p);
+                if((*line_p_cp == *sstr_p) || (g_ignore_case &&
+                        (tolower(*line_p_cp) == tolower(*sstr_p)))){
+                    if(*(sstr_p+1) == '\0'){
+                        //printf("\n\tFound!\n");
+                        return 0;
+                    }
+                }else{
+                    break;
+                }
+                line_p_cp++;
             }
         }
     }
-    //check the rest of the strings for a match
-    // doesn't this not catch matches after the first char found?
-    //  ex: "bits" in "bacon and bits" wouldn't be found, break on "b", no match, end
-
-
     //no match, at end of line
     if(line_p=='\0'){
-        return 0;
+        return -1;
     }
-    /*
-    iterate over line:
-        * look for sstr[0], check if the next len(sstr)-1 chars in the line are
-          equal to sstr
-        * if equal return true
-        * if not equal continue search in line
-        * if at end of line return false
-    characters to look for match for search char 0
-    check if rest of search string is there
-    */
 	return -1;
 }
 
@@ -121,17 +121,14 @@ static int search_string(FILE *in, const char *sstr)
         perror("read error");
         return -1;
     }
-    if(g_count_only)
-        printf("%i", g_count_only);
+    if(g_count_only){
+        printf("%i\n", sstr_matches);
+    }
 	return 0;
 }
 
 int main(int argc, char **argv)
 {
-    printf("\n");
-    printf("+-----------+\n");
-    printf("|  Running  |\n");
-    printf("+-----------+\n");
 
 	FILE *fin = stdin;
 	int rval  = 0;
