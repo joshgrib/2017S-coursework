@@ -1,11 +1,18 @@
+/*
+Josh Gribbon
+CS392
+2017-03-09
+I pledge my honor I have abided by the Stevens Honor System.
+*/
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
+#include <ctype.h> /*for tolower, warning otherwise*/
 
 
-#define OPTS "hcif:"
+#define OPTS "hcibnf:"
 #define OPTS_HELP \
 " Options:\n"\
 "  -f <file>   Read data from file instead of standard input\n"\
@@ -19,6 +26,8 @@ static char *g_search_string = NULL; /* String i'm searching for */
 /* Read input from this file, instead of stdin */
 static char *g_infilename = NULL;
 static int g_ignore_case = 0;/*Ignore case of letters*/
+static int g_show_lines = 0;/*Show line number*/
+static int g_show_offset = 0;/*Show match offset in line*/
 
 
 /* Print usage information */
@@ -39,6 +48,12 @@ static int parse_arguments(int argc, char **argv)
 			break;
         case 'i':
             g_ignore_case = 1;
+            break;
+        case 'n':
+            g_show_lines = 1;
+            break;
+        case 'b':
+            g_show_offset = 1;
             break;
 		case 'f':
             //optarg is globally assigned when calling getopt
@@ -64,31 +79,41 @@ static int parse_arguments(int argc, char **argv)
 }
 
 /* Return 0 if line matches or -1 otherwise */
-static int line_matches(const char *line, const char *sstr)
+static int line_matches(char *line, char *sstr, const int line_num)
 {
-    // find first match
     char *line_p;
+    int offset = 0;
+    //loop through all characters in the line
     for(line_p=line; *line_p!='\0'; line_p++){
+        //if the char matches the first of the search string...
         if(*line_p == *sstr){
-            //printf("\nChecking for '%s' in: %s", sstr, line);
-            //break;
             char *sstr_p;
             char *line_p_cp = line_p;
+            //see if the next characters match the rest of the search string
             for(sstr_p=sstr; *sstr_p!='\0'; sstr_p++){
                 if((*line_p_cp == *sstr_p) || (g_ignore_case &&
                         (tolower(*line_p_cp) == tolower(*sstr_p)))){
+                    //if we're at the end of the search strings it's a full match!
                     if(*(sstr_p+1) == '\0'){
-                        //printf("\n\tFound!\n");
+                        if(g_show_lines){
+                            //print line number
+                            printf("%i ", line_num);
+                        }
+                        if(g_show_offset){
+                            //print offset
+                            printf("%i:", offset);
+                        }
                         return 0;
                     }
                 }else{
+                    //if characters don't match then break
                     break;
                 }
                 line_p_cp++;
             }
         }
+        offset++;
     }
-    //no match, at end of line
     if(line_p=='\0'){
         return -1;
     }
@@ -96,15 +121,17 @@ static int line_matches(const char *line, const char *sstr)
 }
 
 /* Search for string sstr in input read from in */
-static int search_string(FILE *in, const char *sstr)
+static int search_string(FILE *in, char *sstr)
 {
     int r = 0;
     size_t llen = 0;
     char *line = NULL;
     unsigned long sstr_matches = 0;
 
+    int line_num = 0;
     while((r = getline(&line, &llen, in)) > 0){
-        if(line_matches(line, sstr) != 0)
+        line_num++;
+        if(line_matches(line, sstr, line_num) != 0)
             continue;
         sstr_matches++;
         if(!g_count_only){
@@ -122,7 +149,7 @@ static int search_string(FILE *in, const char *sstr)
         return -1;
     }
     if(g_count_only){
-        printf("%i\n", sstr_matches);
+        printf("%lu\n", sstr_matches);
     }
 	return 0;
 }
