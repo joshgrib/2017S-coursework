@@ -72,7 +72,7 @@ Almost goes to Korean War, then doesn't have to, gets typewriter repair shop. UN
 * 1974 - Sells scientific calculators with Japanese components
 * 1976 - Buys MOS Technology Inc. of Norristown, Pennsylvania
     * MOS comes with the MOS 6502 processor, made in 1975
-        * The MOS 6502 is used all over the place for decades, in the Apple II
+        * The MOS 6502 is used all over the place for decades, in the Apple II, PET, Commodore, Atari, Tamagotchi
         * Full features and inexpensive
         * Anyone could buy a chip
         * Everyone has access to documentation

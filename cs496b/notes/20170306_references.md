@@ -73,5 +73,60 @@ We have 2 options for the interpreter, based on how we keep track of the store
 ### The interpreter
 
 ## Explicit references
+**Overall, this just adds `ref-val` to the expressed values**.
+
+Now we can basically use pointers. We make a new type `ref-val` that returns a reference for the address in the store.
+
+Additionally, we can change the environment back to the old way. Instead of everything being a reference to the store we can make them all expressed values, with some being references and some not.
+
+With implicit refs, *every variable is mutable*. Allocation, dereferencing, and mutation are built in.
+* With the explicit design, we give a clear account of these features.
+
+>**Expressed and denoted values**
+>
+>Implicit refs
+>* `ExpVal` = `Int` + `Bool` + `Proc`
+>* `DenVal` = `Ref(ExpVal)`
+>
+>Explicit refs
+>* `ExpVal` = `Int` + `Bool` + `Proc` + `Ref(ExpVal)`
+>* `DenVal` = `ExpVal`
+>
+>*Before we could use references, but now we have access to them*.
+
+We can now also have memory leaks, because we can create values and references in the store without having them assigned to a variable in the environment, so they're in the store but not accessible in any way.
+>"It's like candy is the data, and the store in a candy jar. The issue is if you don't have it in the environment it's like you have no hands. You have no way of getting to it."
+
+>BLASPHEMY!
+> `deref(ref-val 0)` would be a naive way to try to get the value for garbage in the store. The issue with this is *it's mixing the language with the implementation.* Those parts aren't meant to communicate with each other. (This would be a parser error anyway  because `ref-val` isn't part of the syntax).
 
 ### Concrete and abstract syntax
+
+### Specification
+* `deref` will return the value for the given reference
+* `setref` will take in a value, add it to the store, and return the `ref-val`.
+
+### Implementation
+
+
+### Example - swap
+```racket
+let swap = proc(x) proc(y)
+    begin
+        let t = deref(x)
+        in
+        begin
+            setref(x, deref(y));
+            setref(y, t)
+        end
+    end
+in
+let x - newref(1)
+in
+let y - newref(2)
+in
+    begin
+        ((swap x) y);
+        deref(x)
+    end
+```
