@@ -45,6 +45,9 @@ Bitcoin
 * TOR hidden services deployed in Spring along with hidden wiki
 * TOR design paper published
 
+2006
+* The Tor Project is started and takes over main development, and is currently developed largely by volunteers, with nodes also hosted voluntarily
+
 ## Bitcoin
 2006
 * First bitcoin trade
