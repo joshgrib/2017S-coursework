@@ -119,8 +119,8 @@ You would need to extend expressed values, the interpreter, value-of, and a few 
 
 
 * Inductive set derivation
-* What is the result of executing a program - 1 or 2
-* Stored environments closures
+* What is the result of executing a program - 1 or 2 questions
+* Stores environments closures
 * Extend the language, given the abstract syntax tree, change the interpreter and possible the expressed values
 * *Do all exercises in the exercise booklets*
 
