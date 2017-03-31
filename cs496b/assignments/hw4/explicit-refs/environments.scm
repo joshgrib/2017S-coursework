@@ -1,5 +1,5 @@
-(module environments (lib "eopl.ss" "eopl") 
-  
+(module environments (lib "eopl.ss" "eopl")
+
   (require "data-structures.scm")
   (provide init-env empty-env extend-env apply-env)
 
@@ -12,37 +12,47 @@
   ;; expressed value 1, v is bound to the expressed value 5, and x is
   ;; bound to the expressed value 10.
   ;; Page: 69
-  (define init-env 
-    (lambda ()
-      (extend-env 
-       '('i) '((num-val 1))
-       (extend-env
-        '('v) '((num-val 5))
+  (define init-env
+  (lambda ()
+    (extend-env
+      'i
+      (num-val 1)
+      (extend-env
+        'v
+        (num-val 5)
         (extend-env
-         '('x) '((num-val 10))
+         'x
+         (num-val 10)
          (empty-env))))))
 
 ;;;;;;;;;;;;;;;; environment constructors and observers ;;;;;;;;;;;;;;;;
 
+  (define (findVal searchSym bvars bvals)
+  ;;find searchSym in bvars and return the bval for that bvar
+  ;;searchSym guaranteed to be in bvars, base case check not needed
+  (if (eqv? searchSym (car bvars))
+    (car bvals)
+    (findVal searchSym (cdr bvars) (cdr bvals))))
+
   (define apply-env
-    (lambda (env search-sym)
-      (cases environment env
-        (empty-env ()
-          (eopl:error 'apply-env "No binding for ~s" search-sym))
-        (extend-env (bvar bval saved-env)
-	  (if (eqv? search-sym bvar)
-	    bval
-	    (apply-env saved-env search-sym)))
-        (extend-env-rec* (p-names b-vars p-bodies saved-env)
-          (cond 
-            ((location search-sym p-names)
-             => (lambda (n)
-                  (proc-val
-                    (procedure 
-                      (list-ref b-vars n)
-                      (list-ref p-bodies n)
-                      env))))
-            (else (apply-env saved-env search-sym)))))))
+  (lambda (env search-sym)
+    (cases environment env
+    (empty-env ()
+      (eopl:error 'apply-env "No binding for ~s" search-sym))
+    (extend-env (bvars bvals saved-env)
+    (if (location search-sym bvars)
+    (findVal search-sym bvars bvals)
+    (apply-env saved-env search-sym)))
+    (extend-env-rec* (p-names b-vars p-bodies saved-env)
+      (cond
+      ((location search-sym p-names)
+       => (lambda (n)
+          (proc-val
+          (procedure
+            (list-ref b-vars n)
+            (list-ref p-bodies n)
+            env))))
+      (else (apply-env saved-env search-sym)))))))
 
   ;; location : Sym * Listof(Sym) -> Maybe(Int)
   ;; (location sym syms) returns the location of sym in syms or #f is
@@ -51,13 +61,13 @@
   ;;   then (list-ref syms (location sym syms)) = sym
   ;;   else (location sym syms) = #f
   (define location
-    (lambda (sym syms)
-      (cond
-        ((null? syms) #f)
-        ((eqv? sym (car syms)) 0)
-        ((location sym (cdr syms))
-         => (lambda (n) 
-              (+ n 1)))
-        (else #f))))
+  (lambda (sym syms)
+    (cond
+    ((null? syms) #f)
+    ((eqv? sym (car syms)) 0)
+    ((location sym (cdr syms))
+     => (lambda (n)
+        (+ n 1)))
+    (else #f))))
 
   )

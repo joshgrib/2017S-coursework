@@ -29,6 +29,16 @@
         (a-program (exp1)
           (value-of exp1 (init-env))))))
 
+  (define makeList (lambda (start stop)
+    (if (eq? start stop)
+      (cons stop '())
+      (cons start
+          (makeList
+              (if (> stop start)
+                (+ start 1)
+                (- start 1))
+              stop)))))
+
   ;; value-of : Exp * Env -> ExpVal
   ;; Page: 113
   (define value-of
@@ -66,13 +76,10 @@
               (value-of exp3 env))))
 
         ;\commentbox{\ma{\theletspecsplit}}
-        (let-exp (vars exps body)
-          (let ((val1 (value-of (car exps) env)))
-            (value-of
-              (if (eq? (length vars) 1)
-                (body)
-                (let-exp (cdr vars) (cdr exps) body))
-              (extend-env (car vars) val1 env))))
+        (let-exp (var exp1 body)
+          (let ((val1 (value-of exp1 env)))
+            (value-of body
+              (extend-env var val1 env))))
 
         (proc-exp (var body)
           (proc-val (procedure var body env)))
@@ -113,21 +120,11 @@
                 (num-val 23)))))
 
         (for-exp (var startnum endnum loopbody)
-          (define (makeList start stop)
-            (if (eq? start stop)
-              (cons stop '())
-              (cons start
-                  (makeList
-                      (if (> stop start)
-                        (+ start 1)
-                        (- start 1))
-                      stop))))
           (for-each
             (lambda (arg)
               (value-of loopbody (extend-env var arg env)))
-            (makeList startnum endnum)))
-      )))
-
+            (makeList (cdr startnum) (cdr endnum))))
+        )))
 
   ;; apply-procedure : Proc * ExpVal -> ExpVal
   ;;
@@ -143,14 +140,14 @@
     (lambda (proc1 arg)
       (cases proc proc1
         (procedure (var body saved-env)
-      (let ((r arg))
-        (let ((new-env (extend-env var r saved-env)))
-          (when (instrument-let)
-        (begin
-          (eopl:printf
-            "entering body of proc ~s with env =~%"
-            var)
-          (pretty-print (env->list new-env))
+    (let ((r arg))
+      (let ((new-env (extend-env var r saved-env)))
+        (when (instrument-let)
+    (begin
+      (eopl:printf
+        "entering body of proc ~s with env =~%"
+        var)
+      (pretty-print (env->list new-env))
                   (eopl:printf "store =~%")
                   (pretty-print (store->readable (get-store-as-list)))
                   (eopl:printf "~%")))
