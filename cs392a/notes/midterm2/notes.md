@@ -216,6 +216,21 @@ If you're using a 2D array iterate over the outer array, then iterate over the i
     * *Run time*, by application programs
 * Linkers allow for *separate compilation* of files
 
+**Global variables should be avoided if possible** - otherwise use `static`, initialize all globals, or use `extern` for referencing external globals
+
+### Static linking
+Source files (`main.c`, `foo.c`) are translated through compilation into separate **relocatable** object files(`main.o`, `foo.o`), and then linked to form the *executable* object file(`prog`) that contains code and data for all functions
+
+### Why linkers?
+1. **Modularilty** - separate files, libraries for common functions
+2. **Efficiency**
+    * Time - separate compilation
+    * Space - libraries
+
+### What do linkers do?
+1. **Symbol resolution** - associate each symbol reference with exactly one symbol definition
+2. **Relocation** - merge code and data blocks into larger sections, move symbols from relative to absolute memory locations, update references to new positions
+
 ### 7.1 Compiler Drivers
 Included in most compilation systems to invoke language preprocessor, compiler, assembler, and linker on behalf of the user
 
@@ -239,15 +254,172 @@ Compilers and assemblers generate relocatable object files, linkers generate exe
 There are different file formats, the book uses the Unix *Executable and Linkable Format*(**ELF**).
 
 ### 7.4 Relocatable Object Files
-### 7.5 Symbols and Symbol Tables
-### 7.6 Symbol Resolution
-### 7.7 Relocation
-### 7.8 Executable Object Files
-### 7.9 Loading Executable Object Files
-### 7.10 Dynamic Linking with Shared Libraries
-### 7.11 Loading and Linking Shared Libraries from Applications
-### 7.12 Position-Independent Code (PIC)
-### 7.13 Tools for Manipulating Object Files
-### 7.14 Summary
+>ELF relocatable object file structure
 
-## 16 - Exceptional Control Flow
+| Sections(in order)   | What it is                                                        |
+| :------------------- | :---------------------------------------------------------------- |
+| ELF header           | 16-byte sequence describing word size and byte ordering           |
+| `.text`              | Machine code of program                                           |
+| `.rodata`            | Read-only data like format strings and jump tables                |
+| `.data`              | _Initialized_ global C vars                                       |
+| `.bss`               | _Uninitialized_ global C vars                                     |
+| `.symtab`            | Symbol table                                                      |
+| `.rel.text`          | List of locations in `.text` for linker to modify                 |
+| `.rel.data`          | Relocation info for global vars                                   |
+| `.debug`             | Debugging symbol table                                            |
+| `.line`              | Line mapping for original C source to machine code in `.text`     |
+| `.strtab`            | String table for symbol tables in `.symtab` and `.debug` sections |
+| Section header table | Describes offsets(locations) and sizes of sections in object file |
+
+
+### 7.5 Symbols and Symbol Tables
+Three kinds of symbols:
+* **Global symbols** are defined in the module and referenced by other modules
+    * Non-static C functions and global vars defined without the C `static` attribute
+        * `static` variables are stores in `bss` or `data`, non-static are stored on the stack at run time
+* **Reference**(external) **symbols** are referenced in the module and defined in other modules
+    * C functions and variables defined in other modules
+* **Local symbols** are defined and referenced exclusively by the module
+    * There *are not the same as local variables*, those are managed on the stack at run time and the linker doesn't care about them
+
+The **sybmol table** is an *array of structs* with info for each symbol
+
+### 7.6 Symbol Resolution
+* Each reference is mapped to exactly one definition from the symbol table
+* **Locally defined symbol references** are linked to the definitions in the same module by the compiler
+* **Globally defined symbol references** are not defined in the same module, so the compiler just makes a linker symbol table for the linker to handle
+    * The linker will look for the definition in another module
+        * *If no definition found* then the linker prints and error and stops
+        * *If multiple definitions found* linker follows process below
+
+#### 7.6.1 Duplicate symbol definition resolution
+Symbols can be:
+* **weak** - uninitialized globals
+* **strong** - procedures and initialized globals
+
+Rules:
+1. *Duplicate strong definitions = error*
+2. *Strong and duplicate weak = use strong defintion*
+3. *Duplicate weak definitions = choose arbitrary weak*
+
+Misc quirks:
+* Two uninitialized ints in different module to reference the same ints
+* Two initialized ints and one uninitialized double with the same name as the first will cause an overwrite for both ints
+* Initialized int with same name uninitialized in different module with reference same initialized variable
+
+#### 7.6.2 Linking with static libraries
+**Static libraries** (`.a` archive files)
+* Concatenate related relocatable object files together and provide an index
+* Enhance linker to resolve external refs by looking in archives
+
+##### Common static libraries
+* **`libc.a`** - the C standard library
+    * I/O, memory allocation, signal handling, string handling, date and time, random numbers, integer math
+* **`libm.a`** - the C math library
+    * Floating point math (sin, cos, tan, log, exp, sqrt, ...)
+
+### 7.7 Relocation
+Two steps:
+1. **Relocating sections and symbol definitions**
+    * Merge all object file sections of the same type together into a new section of the same type
+    * Assign run time memory addresses to sections and symbols
+        * After this every instructions and global variable have unique run-time memory addresses
+2. **Relocating symbol references within sections**
+    * Modify all symbols references in bodies of code and data sections to point to correct run-time addresses, relying on *relocation entries*, which the compiler makes to tell the linker how to modify references
+### 7.8 Executable Object Files
+>ELF executable object file structure
+
+| Sections(in order)   | What it is           |
+| :-----------------   | :------------------- |
+| ELF Header           | File format description |
+| Segment header table | Maps file sections to runtime memory segments |
+| `.init` | Defines `_init`, called by programs initialization code |
+| `.text` | Machine code of program, **now with real addresses** |
+| `.rodata` | Read-only data like format strings and jump tables, **now with real addresses** |
+| `.data` | _Initialized_ global C vars, **now with real addresses** |
+| `.bss` | _Uninitialized global C vars |
+| `.symtab` | Symbol table |
+| `.debug` | Debugging symbol table |
+| `.line` | Line mappings to source code |
+| `.strtab` | String table |
+| Section header table | Describes offsets(locations) and sizes of sections in object file |
+
+### 7.9 Loading Executable Object Files
+The `loader` is called to copy the code and data in executable into memory and jumps to the **entry point**(first instruction)
+
+Linux run-time memory depiction:
+```
+  +----------------------------+
+  |       Kernel memory        |
+  +----------------------------+ ^-- Above here invisible to user code
+  |        User stack          |
+  |   (created at run time)    |
+  +----------------------------+ <-- %esp (stack pointer)
+  |            ...             |
+  +----------------------------+
+  |  Memory-mapped region for  |
+  |      shared libraries      |
+  +----------------------------+
+  |            ...             |
+  +----------------------------+ <-- brk
+  |       Run-time heap        |
+  |    (created by malloc)     |
+  +----------------------------+
+  |    Read/write segment      |
+  |      (.data, .bss)         |
+  +----------------------------+
+  |    Read-only segment       |
+  |  (.init, .text, .rodata)   |
+  +----------------------------+
+  |                            |
+0 +----------------------------+
+```
+
+### 7.10 Dynamic Linking with Shared Libraries
+Issues with static libraries:
+* Need to be maintained and updated periodically
+* Programs linked with old library would need to be relinked for any update
+* Commonly used functions are duplicated in `.text` section of each running process (avg system might have 50-100 processes running)
+
+A **shared library** in an object module that can be loaded into an arbitrary memory address and linked with a program in memory *at run time*. This is called **dynamic linking** and is performed by the **dynamic linker**..
+
+Also called *shared objects*(`.so`), or *dynamic link libraries*(DLL) with Microsoft .
+
+Shared library routines *can be shared by multiple processes*.
+
+Dynamic linking can occur:
+* **At load time** by the loader
+* **At run time** using `dlopen()`
+
+### 7.12 Position-Independent Code (PIC)
+Code is compiled to be executed at any location in memory, and then the actual locations are decided and assigned at run time.
+
+Shared libraries are compiled like this to be loaded anywhere and shared at run time
+
+### 7.14 Summary
+* Linking allows programs to be constructed from multiple object files
+* The linker works with the compiler and loader to create the executable
+* Linking of *relocatable object files* can happen at *compile time* with *static linkers*
+* Linking of *shared object files* can happen at *load or run time* with *dynamic linkers*
+    * Implicitly when the program in loaded and executed
+    * Explicitly on-demand with `dlopen`
+* Linkers have 2 main tasks:
+    1. Symbol resolution
+    2. Relocation
+
+### Library Interpositioning
+**Library interpositioning** is a linking technique that allows programmers to intercept calls to arbitrary functions, like a middleware for the function.
+
+Can occur at:
+* compile time - wrapper for functions
+* link time - linker uses special name resolutions
+* load or run time - custom function function versions with dynamic linking
+
+Uses:
+* Security - sandboxing, encryption
+* Debugging - a probe to see input and output
+* Monitoring/profiling - get usage metrics
+
+## 16 - Exceptional Control Flow (ch 8)
+### 8.1 Exceptions
+### 8.2 Processes
