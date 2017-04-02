@@ -92,7 +92,7 @@ Jack's Themes
 ## IBM PC
 **1981**
 * Release of Model 5150 - the origin of Windows, based on this architecture
-* 62% of manframe market
+* 62% of mainframe market
 * 60%(1970) - 32%(1980) of computer market
 
 To come up with a different idea, they said "what would we do if we weren't IBM", and found a bunch of random cheap parts and put them together. **Because of making a product out of pieces anyone can get, people just made their own**. Then they got a ton of competitors and some are better.
