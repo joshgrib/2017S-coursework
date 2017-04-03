@@ -2,12 +2,9 @@
 
 ## 10 - C Language Basics
 
-
 ## 11 - C Language Libraries
 
-
 ## 12 - C Language stdio
-
 
 ## 13 - The Memory Hierarchy (ch 6)
 ### 6.1 - Storage Technology
@@ -421,5 +418,140 @@ Uses:
 * Monitoring/profiling - get usage metrics
 
 ## 16 - Exceptional Control Flow (ch 8)
+Processors do one thing - read and execute a sequence of instructions one at a time. The sequence is called the CPU's **control flow**, or *flow of control*
+
+Up to this point we have *two ways to change control flow*:
+1. Jumps and branches
+2. Call and return
+
+Both react to changes in *program state*
+
+But we want to be able to react to changes in *system state*
+* Data arrives from disk or network adapter
+* Divide by zero
+* User hits Ctrl-C
+* System timer expires
+
+### Exceptional control flow
+Exists at all levels:
+1. Low - **Exceptions**
+    * Change in control flow in response to system event
+    * Implemented with hardware and OS software
+2. High - **Process context switch**
+    * Implemented with OS software and hardware timer
+3. High - **Signals**
+    * Implemented with OS software
+4. High - **Nonlocal jumps** (`setjump()` and `longjump()`)
+    * Implemented by C runtime library
+
 ### 8.1 Exceptions
+An **exception** is a *transfer on control to the OS kernel in response to some event* (change in processor state)
+
+The **kernel** is a memory-resident part of the OS
+
+**Exception tables**(aka *interrupt vectors*) map exception numbers to the code that handles the event
+
+#### Asynchronous exceptions
+**Caused by events external to the processor**
+
+**Interrupt**
+* Indicated by setting the processors **interrupt pin**
+* Handler returns to "next" instruction
+
+**Examples**
+* Timer interrupt
+    * Every few ms a timer chip triggers an interrupt
+    * Used by the kernel to take back control from user programs
+* I/O interrupt from external device
+    * Ctrl-C
+    * New packet from network
+    * Data from disk
+
+#### Synchronous exceptions
+**Caused by the result of executing an instruction**
+
+* **Traps**
+    * Intentional
+    * System calls, breakpoint traps, special instructions
+    * Returns control to "next" instruction
+* **Faults**
+    * Unintentional but recoverable
+    * Page fault, protection fault, floating point exceptions
+    * Either re-executes faulting current instruction or aborts
+* **Aborts**
+    * Unintentional, unrecoverable
+    * Illegal instruction, parity error, machine check
+    * Aborts current program
+
+#### System calls
+**System calls** provide a way for application programs to request services from the kernel.
+
+Popular Linux system calls:
+| Number | Name      | Description                 | Number | Name        | Description                                    |
+| :----- | :-------- | :-------------------------- | :----- | :---------- | :--------------------------------------------- |
+| 1      | `exit`    | Terminate process           | 27     | `alarm`     | Set signal delivery alarm clock                |
+| 2      | `fork`    | Create new process          | 29     | `pause`     | Suspend process until signal arrives           |
+| 3      | `read`    | Read file                   | 37     | `kill`      | Send signal to another process                 |
+| 4      | `write`   | Write file                  | 48     | `signal`    | Install signal handler                         |
+| 5      | `open`    | Open file                   | 63     | `dup2`      | Copy file descriptor                           |
+| 6      | `close`   | Close file                  | 64     | `getppid`   | Get parent’s process ID                        |
+| 7      | `waitpid` | Wait for child to terminate | 65     | `getpgrp`   | Get process group                              |
+| 11     | `execve`  | Load and run program        | 67     | `sigaction` | Install                portable signal handler |
+| 19     | `lseek`   | Go to file offset           | 90     | `mmap`      | Map memory page        to file                 |
+| 20     | `getpid`  | Get process ID              | 106    | `stat`      | Get information        about file              |
+
 ### 8.2 Processes
+A **process** is *an instance of a running program*
+
+Processes provide each program with *two key abstractions*:
+1. **Logical control flow**
+    * Each programs appears to have exclusive use of the CPU
+    * Provided by **context switching** in the kernel
+2. **Private address space**
+    * Each programs appears to have exclusive use of main memory
+    * Provided by **virtual memory** in the kernel
+
+#### Traditional implementation
+* Each process has space in memory where it stores:
+    * Stack
+    * Heap
+    * Data
+    * Code
+    * **Saved registers** - allow the CPU to load and save registers, freeing to to be used by other processes
+* Single processor executes multiple processes concurrently
+    * Process executions are interleaved (*multitasking*)
+    * Address spaces are managed in the *virtual memory system*
+    * **Context switching** is when the CPU has to switch the saved registers and address space
+
+```
++-----------------------------------------------------------------+
+|  Memory                                                         |
+|  +-----------------+  +-----------------+  +-----------------+  |
+|  |    Process 1    |  |    Process 1    |  |    Process 1    |  |
+|  +-----------------+  +-----------------+  +-----------------+  |
+|  |      Stack      |  |      Stack      |  |      Stack      |  |
+|  |      Heap       |  |      Heap       |  |      Heap       |  |
+|  |      Data       |  |      Data       |  |      Data       |  |
+|  |      Code       |  |      Code       |  |      Code       |  |
+|  +-----------------+  +-----------------+  +-----------------+  |
+|  | Saved Registers |  | Saved Registers |  | Saved Registers |  |
+|  +-----------------+  +---^---------|---+  +-----------------+  |
++---------------------------|---------|---------------------------+
+                        +---|---------|---+
+                        |   |  CPU    |   |
+                    <== | +-|---------v-+ | ==>
+                        | |  Registers  | |
+                        | +-------------+ |
+                        +-----------------+
+```
+
+#### Modern implementation
+* **Multicore processors** have multiple CPUs on one chip
+    * Share main memory (and some caches)
+    * Each can execute separate processes
+    * Scheduling of processors handled by kernel
+
+#### Concurrent processes
+* Each process is a logical control flow
+* Two processes are **concurrent** if their control flows overlap in time, otherwise they are **sequential**
+* Control flows for concurrent processes are physically disjoint in time, but we can think of them as running in parallel
