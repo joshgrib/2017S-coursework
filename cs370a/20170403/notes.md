@@ -1,4 +1,9 @@
-Today we're going to 
+Today we're going to work on dynamic programming problems
+
+With James Dimmick, Karan Shah, TC
 
 **Problem 1**
-With James Dimmick and Karan Shah
+[SPOJ ACODE](http://www.spoj.com/problems/ACODE/)
+
+**Problem 2**
+[PE #81](https://projecteuler.net/problem=81)
