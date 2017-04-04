@@ -60,7 +60,7 @@
 * DRAMs and SRAMs lose state if they lose power
 * **Nonvolatile memory** will retain value after losing power
     * Read only memory(**ROM**) is programmed during production
-    * Reprogrammable ROM (**PROM**) can be programmed once
+    * Programmable ROM (**PROM**) can be programmed once
     * Erasable PROM (**EPROM**) can be bulk erased with UV or X-rays
     * Electrically erasable PROM (**EEPROM**) can use electricity
     * **Flash memory** is EEPROM with partial erase capability, that runs out after 100,000 or so erasings
@@ -160,6 +160,17 @@ Example memory hierarchy:
 
 #### Caches
 A **cache** is a smaller faster storage device acting as a staging area for a subset of the data in a larger slower device
+
+* Cache is split into **sets** made of **lines**
+* Lines hold **blocks**, made of a **valid bit**, **tag**, and **bits**
+* The address of the item gets split into the tag, set index, and block offset, in that order
+    * Set index finds the set, then the cache looks for a matching tag across the lines, then uses the block offset to find the data
+
+Cache can be defined with:
+* **S** = set count
+* **E** = lines/set
+* **B** = block size, 2^b where b is the amount of bits
+* Cache size(**C**) = S*E*B
 
 #### Cache Hits
 When a program needs a data object *d* from level *k+1*, it will look for *d* in the current level *k*. If it is found, we have a **cache hit**, and it reads the data directly from level *k*, which is faster than going to level *k+1*. Good locality results in more cache hits, and less misses
