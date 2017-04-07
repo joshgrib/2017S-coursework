@@ -1,14 +1,14 @@
 #
 # Student makefile for Cache Lab
-# Note: requires a 64-bit x86-64 system 
+# Note: requires a 64-bit x86-64 system
 #
 CC = gcc
 CFLAGS = -g -Wall -Werror -std=c99 -m64
 
-all: csim 
+all: csim
 
 csim: csim.c cachelab.c cachelab.h
-	$(CC) $(CFLAGS) -o csim csim.c cachelab.c #-lm 
+	$(CC) $(CFLAGS) -o csim csim.c cachelab.c #-lm
 
 #
 # Clean the src dirctory
