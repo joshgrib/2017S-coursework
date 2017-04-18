@@ -10,8 +10,7 @@
 #define MATRIX_ELEMP(m, i, j) ((m)->data + (i) * (m)->d + (j))
 
 
-int omatrix_create(omatrix_t *m, unsigned int n)
-{
+int omatrix_create(omatrix_t *m, unsigned int n){
 	int i;
 	matrix_elem_t *d = NULL;
 	size_t msize = sizeof(matrix_elem_t) * n * n;
@@ -35,14 +34,12 @@ int omatrix_create(omatrix_t *m, unsigned int n)
 	return 0;
 }
 
-void omatrix_destroy(omatrix_t *m)
-{
+void omatrix_destroy(omatrix_t *m){
 	free(m->data);
 	memset(m, 0, sizeof(omatrix_t));
 }
 
-int omatrix_check(omatrix_t *m)
-{
+int omatrix_check(omatrix_t *m){
 	unsigned int i, j, e;
 	matrix_elem_t *col;
 
@@ -58,14 +55,11 @@ int omatrix_check(omatrix_t *m)
 			}
 		}
 	}
-
 	return 1;
 }
 
 /* Transpose block located on the diagonal (blockidx, blockidx) */
-static void transpose_diagonal(omatrix_t *m,
-		unsigned int blockidx, unsigned int b)
-{
+static void transpose_diagonal(omatrix_t *m, unsigned int blockidx, unsigned int b){
 	unsigned int i, j;
 	matrix_elem_t *ij, *ji, tmp;
 
@@ -86,19 +80,16 @@ static void transpose_diagonal(omatrix_t *m,
 }
 
 /* Transpose block blocki, blockj with blockj, blocki, where blocki != blockj */
-static void transpose_blocks(omatrix_t *m, 
-		unsigned int blocki, unsigned blockj,
-		unsigned int bsize)
-{
+static void transpose_blocks(omatrix_t *m, unsigned int blocki, unsigned blockj, unsigned int bsize){
+
 }
 
-/* 
+/*
  * Transpose matrix. If bsize == the dimension of the matrix then blocking is
  * not used. If bsize is smaller than that, then do blocked transposition with
  * block size of bsize.
  */
-void omatrix_transpose(omatrix_t *m, unsigned int bsize)
-{
+void omatrix_transpose(omatrix_t *m, unsigned int bsize){
 	unsigned int i;
 
 	assert(m->d % bsize == 0);
@@ -108,7 +99,7 @@ void omatrix_transpose(omatrix_t *m, unsigned int bsize)
 		transpose_diagonal(m, i, bsize);
 	}
 
-	if (bsize >= m->d) 
+	if (bsize >= m->d)
 		return;
 
 	/* Non-diagonal blocks */
