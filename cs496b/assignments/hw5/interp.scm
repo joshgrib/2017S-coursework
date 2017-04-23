@@ -147,18 +147,19 @@
             (value-of body env3)))
         ;;new for hw 5
         (emptylist-exp (t1)
-          '())
+          (list-val '()))
         ;;new for hw 5
         (cons-exp (exp1 exp2)
           (let ((v1 (value-of exp1 env))
                 (v2 (value-of exp2 env)))
-            (if (null? v2)
+            (if (expval->null? v2)
               (list-val (list v1))
-              (list-val (list v1 v2)))))
+              (list-val (list v1 v2)))
+          ))
         ;;new for hw 5
         (null?-exp (exp1)
           (let ((v1 (value-of exp1 env)))
-            (bool-val (null? v1))))
+            (bool-val (expval->null? v1))))
         ;;new for hw 5
         (car-exp (exp1)
           (let ((v1 (value-of exp1 env)))

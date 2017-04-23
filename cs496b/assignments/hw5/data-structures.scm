@@ -78,14 +78,14 @@
   (define expval->car
     (lambda (l)
       (cases expval l
-        (list-val (l) (car l))
+        (list-val (l) (list-val (car l)))
         (else (expval-extractor-error 'listCar l)))))
 
   ;;new for hw 5
   (define expval->cdr
     (lambda (l)
       (cases expval l
-        (list-val (l) (cdr l))
+        (list-val (l) (list-val (cdr l)))
         (else (expval-extractor-error 'listCdr l)))))
 
   (define expval-extractor-error
