@@ -23,6 +23,8 @@
     (pair-val
       (fst expval?)
       (snd expval?))
+    (list-val
+      (lst list?))
   )
 
 ;;; extractors:
@@ -64,6 +66,27 @@
       (cases expval v
         (pair-val (e1 e2)e2)
         (else (expval-extractor-error 'pairSnd v)))))
+
+  ;;new for hw 5
+  (define expval->null?
+    (lambda (l)
+      (cases expval l
+        (list-val (l) (null? l))
+        (else (expval-extractor-error 'listNull? l)))))
+
+  ;;new for hw 5
+  (define expval->car
+    (lambda (l)
+      (cases expval l
+        (list-val (l) (car l))
+        (else (expval-extractor-error 'listCar l)))))
+
+  ;;new for hw 5
+  (define expval->cdr
+    (lambda (l)
+      (cases expval l
+        (list-val (l) (cdr l))
+        (else (expval-extractor-error 'listCdr l)))))
 
   (define expval-extractor-error
     (lambda (variant value)

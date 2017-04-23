@@ -104,7 +104,7 @@
       ;;new for hw 5
       (expression
         ("pair" "(" expression "," expression ")")
-        pair-exp )
+        pair-exp)
       ;;new for hw 5
       (expression
         ("unpair" "(" identifier "," identifier ")" "=" expression
@@ -114,8 +114,32 @@
       (type
         ("<" type "*" type ">")
         pair-type)
-      )
+      ;;new for hw 5
+      (expression
+        ("emptylist" type)
+        emptylist-exp)
+      ;;new for hw 5
+      (expression
+        ("cons" "(" expression "," expression ")")
+        cons-exp)
+      ;;new for hw 5
+      (expression
+        ("null?" "(" expression ")")
+        null?-exp)
+      ;;new for hw 5
+      (expression
+        ("car" "(" expression ")")
+        car-exp)
+      ;;new for hw 5
+      (expression
+        ("cdr" "(" expression ")")
+        cdr-exp)
+      ;;new for hw 5
+      (type
+        ("list" "(" type ")")
+        list-type)
     )
+  )
 
   ;;;;;;;;;;;;;;;; sllgen boilerplate ;;;;;;;;;;;;;;;;
 
@@ -161,6 +185,9 @@
             '>
           )
         )
+        ;;new for hw 5
+        (list-type (t1)
+          (list 'list (type-to-external-form t1)))
       )
     )
   )

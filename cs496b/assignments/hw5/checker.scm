@@ -137,6 +137,21 @@
         (unpair-exp (id-1 id-2 exp1 body)
           (eopl:error "not implemented!"))
         ;;new for hw 5
+        (emptylist-exp (t1)
+          (eopl:error "not implemented!"))
+        ;;new for hw 5
+        (cons-exp (exp1 exp2)
+          (eopl:error "not implemented!"))
+        ;;new for hw 5
+        (null?-exp (exp1)
+          (eopl:error "not implemented!"))
+        ;;new for hw 5
+        (car-exp (exp1)
+          (eopl:error "not implemented!"))
+        ;;new for hw 5
+        (cdr-exp (exp1)
+          (eopl:error "not implemented!"))
+        ;;new for hw 5
         (showstore-exp ()
           (eopl:error "not implemented!"))
         ;;new for hw 5
