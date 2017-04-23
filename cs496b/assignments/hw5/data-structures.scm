@@ -7,9 +7,6 @@
 
 ;;;;;;;;;;;;;;;; expressed values ;;;;;;;;;;;;;;;;
 
-;;; an expressed value is either a number, a boolean, a procval, or a
-;;; reference.
-
   (define-datatype expval expval?
     (num-val
       (value number?))
@@ -25,6 +22,10 @@
       (snd expval?))
     (list-val
       (lst list?))
+    (tree-val
+      (node expval?)
+      (lst expval?)
+      (rst expval?))
   )
 
 ;;; extractors:
@@ -58,40 +59,69 @@
     (lambda (v)
       (cases expval v
         (pair-val (e1 e2)e1)
-        (else (expval-extractor-error 'pairFst v)))))
-
+        (else (expval-extractor-error 'pair v)))))
   ;;new for hw 5
   (define expval->snd
     (lambda (v)
       (cases expval v
         (pair-val (e1 e2)e2)
-        (else (expval-extractor-error 'pairSnd v)))))
-
+        (else (expval-extractor-error 'pair v)))))
+        
   ;;new for hw 5
   (define expval->null?
     (lambda (l)
       (cases expval l
         (list-val (l) (null? l))
-        (else (expval-extractor-error 'listNull? l)))))
-
+        (else (expval-extractor-error 'list l)))))
   ;;new for hw 5
   (define expval->car
     (lambda (l)
       (cases expval l
         (list-val (l) (list-val (car l)))
-        (else (expval-extractor-error 'listCar l)))))
-
+        (else (expval-extractor-error 'list l)))))
   ;;new for hw 5
   (define expval->cdr
     (lambda (l)
       (cases expval l
         (list-val (l) (list-val (cdr l)))
-        (else (expval-extractor-error 'listCdr l)))))
+        (else (expval-extractor-error 'list l)))))
+
+  ;;new for hw 5
+  (define expval->nullT?
+    (lambda (t)
+      (cases expval t
+        (tree-val (n lst rst)
+          (and
+            (eq? n (unit-val))
+            (eq? lst (unit-val))
+            (eq? rst (unit-val))))
+        (else (expval-extractor-error 'tree t)))))
+  ;;new for hw 5
+  (define expval->getData
+    (lambda (t)
+      (cases expval t
+        (tree-val (n lst rst)
+          n)
+        (else (expval-extractor-error 'tree t)))))
+  ;;new for hw 5
+  (define expval->getLST
+    (lambda (t)
+      (cases expval t
+        (tree-val (n lst rst)
+          lst)
+        (else (expval-extractor-error 'tree t)))))
+  ;;new for hw 5
+  (define expval->getRST
+    (lambda (t)
+      (cases expval t
+        (tree-val (n lst rst)
+          rst)
+        (else (expval-extractor-error 'tree t)))))
 
   (define expval-extractor-error
     (lambda (variant value)
       (eopl:error 'expval-extractors "Looking for a ~s, found ~s"
-	variant value)))
+	     variant value)))
 
 ;;;;;;;;;;;;;;;; procedures ;;;;;;;;;;;;;;;;
 

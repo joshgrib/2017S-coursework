@@ -152,6 +152,24 @@
         (cdr-exp (exp1)
           (eopl:error "not implemented!"))
         ;;new for hw 5
+        (emptytree-exp (t1)
+          (eopl:error "not implemented!"))
+        ;;new for hw 5
+        (node-exp (exp1 exp2 exp3)
+          (eopl:error "not implemented!"))
+        ;;new for hw 5
+        (nullT?-exp (exp1)
+          (eopl:error "not implemented!"))
+        ;;new for hw 5
+        (getData-exp (exp1)
+          (eopl:error "not implemented!"))
+        ;;new for hw 5
+        (getLST-exp (exp1)
+          (eopl:error "not implemented!"))
+        ;;new for hw 5
+        (getRST-exp (exp1)
+          (eopl:error "not implemented!"))
+        ;;new for hw 5
         (showstore-exp ()
           (eopl:error "not implemented!"))
         ;;new for hw 5

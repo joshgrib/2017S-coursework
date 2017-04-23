@@ -168,6 +168,31 @@
         (cdr-exp (exp1)
           (let ((v1 (value-of exp1 env)))
             (expval->cdr v1)))
+        ;;new for hw 5
+        (emptytree-exp (t1)
+          (tree-val (unit-val) (unit-val) (unit-val)))
+        ;;new for hw 5
+        (node-exp (exp1 exp2 exp3)
+          (let ((v1 (value-of exp1 env))
+                (v2 (value-of exp2 env))
+                (v3 (value-of exp3 env)))
+            (tree-val v1 v2 v3)))
+        ;;new for hw 5
+        (nullT?-exp (exp1)
+          (let ((t1 (value-of exp1 env)))
+            (bool-val (expval->nullT? t1))))
+        ;;new for hw 5
+        (getData-exp (exp1)
+          (let ((t1 (value-of exp1 env)))
+            (expval->getData t1)))
+        ;;new for hw 5
+        (getLST-exp (exp1)
+          (let ((t1 (value-of exp1 env)))
+            (expval->getLST t1)))
+        ;;new for hw 5
+        (getRST-exp (exp1)
+          (let ((t1 (value-of exp1 env)))
+            (expval->getRST t1)))
       )
     )
   )

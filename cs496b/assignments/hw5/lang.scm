@@ -101,6 +101,7 @@
       (type
         ("ref" "(" type ")")
         ref-type)
+        
       ;;new for hw 5
       (expression
         ("pair" "(" expression "," expression ")")
@@ -114,6 +115,7 @@
       (type
         ("<" type "*" type ">")
         pair-type)
+
       ;;new for hw 5
       (expression
         ("emptylist" type)
@@ -138,6 +140,35 @@
       (type
         ("list" "(" type ")")
         list-type)
+
+      ;;new for hw 5
+      (expression
+        ("emptytree" type)
+        emptytree-exp)
+      ;;new for hw 5
+      (expression
+        ("node" "(" expression "," expression "," expression ")")
+        node-exp)
+      ;;new for hw 5
+      (expression
+        ("nullT?" "(" expression ")")
+        nullT?-exp)
+      ;;new for hw 5
+      (expression
+        ("getData" "(" expression ")")
+        getData-exp)
+      ;;new for hw 5
+      (expression
+        ("getLST" "(" expression ")")
+        getLST-exp)
+      ;;new for hw 5
+      (expression
+        ("getRST" "(" expression ")")
+        getRST-exp)
+      ;;new for hw 5
+      (type
+        ("tree" "(" type ")")
+        tree-type)
     )
   )
 
@@ -188,6 +219,9 @@
         ;;new for hw 5
         (list-type (t1)
           (list 'list (type-to-external-form t1)))
+        ;;new for hw 5
+        (tree-type (t1)
+          (list 'tree (type-to-external-form t1)))
       )
     )
   )
