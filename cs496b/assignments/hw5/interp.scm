@@ -1,5 +1,5 @@
 (module interp (lib "eopl.ss" "eopl")
-  
+
   ;; interpreter for the EXPLICIT-REFS language
 
   (require "drscheme-init.scm")
@@ -8,7 +8,7 @@
   (require "data-structures.scm")
   (require "environments.scm")
   (require "store.scm")
-  
+
   (provide value-of-program value-of instrument-let instrument-newref)
 
   ;;;;;;;;;;;;;;;; switches for instrument-let ;;;;;;;;;;;;;;;;
@@ -22,7 +22,7 @@
 
   ;; value-of-program : Program -> ExpVal
   ;; Page: 110
-  (define value-of-program 
+  (define value-of-program
     (lambda (pgm)
       (initialize-store!)               ; new for explicit refs.
       (cases program pgm
@@ -54,7 +54,7 @@
                           (num2 (expval->num val2)))
                       (num-val
                        (- num1 num2)))))
-      
+
         ;\commentbox{\zerotestspec}
         (zero?-exp (exp1)
                    (let ((val1 (value-of exp1 env)))
@@ -62,7 +62,7 @@
                        (if (zero? num1)
                            (bool-val #t)
                            (bool-val #f)))))
-              
+
         ;\commentbox{\ma{\theifspec}}
         (if-exp (exp1 exp2 exp3)
                 (let ((val1 (value-of exp1 env)))
@@ -71,11 +71,11 @@
                       (value-of exp3 env))))
 
         ;\commentbox{\ma{\theletspecsplit}}
-        (let-exp (var exp1 body)       
+        (let-exp (var exp1 body)
                  (let ((val1 (value-of exp1 env)))
                    (value-of body
                              (extend-env var val1 env))))
-        
+
         (proc-exp (var type body)
                   (proc-val (procedure var body env)))
 
@@ -89,7 +89,7 @@
                               (extend-env-rec* (list name) (list bVar) (list body) env)))
 
         (begin-exp (exp1 exps)
-                   (letrec 
+                   (letrec
                        ((value-of-begins
                          (lambda (e1 es)
                            (let ((v1 (value-of e1 env)))
@@ -112,16 +112,16 @@
                       (let ((v2 (value-of exp2 env)))
                         (begin
                           (setref! ref v2)
-                          (num-val 23)))))
+                          (unit-val)))))
 
         (for-exp (var lbe ube exp1)
                  (let* ((v1 (value-of lbe env))
                         (varRef (newref v1))
                         (env2 (extend-env var (ref-val varRef) env))
                         (v2 (value-of ube env2)))
-                   ( if (<= (expval->num v1) (expval->num v2)) 
+                   ( if (<= (expval->num v1) (expval->num v2))
                         (do ((i (expval->num v1) (+ i 1)))
-                          ((= i (+ 1 (expval->num v2))) )   
+                          ((= i (+ 1 (expval->num v2))) )
                           (begin (setref! varRef (num-val i))
                                  ; (write "value of var")
                                  ; (write (deref varRef))
@@ -129,11 +129,28 @@
                                  (value-of exp1 env2)
                                  )
                           )
-                        (num-val 23))))
-        )))
+                        (unit-val))))
+
+        ;;new for hw 5
+        (pair-exp (exp1 exp2)
+          (let ((v1 (value-of exp1 env))
+                (v2 (value-of exp2 env)))
+            (pair-val v1 v2)))
+        ;;new for hw 5
+        (unpair-exp (id1 id2 exp1 body)
+          (let* ((p-val (value-of exp1 env))
+                 (fst (expval->fst p-val))
+                 (snd (expval->snd p-val))
+                 (env2 (extend-env id1 fst env))
+                 (env3 (extend-env id2 snd env2))
+                 )
+            (value-of body env3)))
+      )
+    )
+  )
 
   ;; apply-procedure : Proc * ExpVal -> ExpVal
-  ;; 
+  ;;
   ;; uninstrumented version
   ;;   (define apply-procedure
   ;;    (lambda (proc1 arg)
@@ -160,7 +177,7 @@
                        (value-of body new-env)))))))
 
 
-  ;; store->readable : Listof(List(Ref,Expval)) 
+  ;; store->readable : Listof(List(Ref,Expval))
   ;;                    -> Listof(List(Ref,Something-Readable))
   (define store->readable
     (lambda (l)
@@ -170,9 +187,5 @@
           (car p)
           (expval->printable (cadr p))))
        l)))
- 
+
   )
-  
-
-
-  

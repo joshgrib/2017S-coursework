@@ -16,14 +16,14 @@
   ;; Page: 243
   (define report-unequal-types
     (lambda (ty1 ty2 exp)
-      (eopl:error 'check-equal-type!  
+      (eopl:error 'check-equal-type!
           "Types didn't match: ~s != ~a in~%~a"
           (type-to-external-form ty1)
           (type-to-external-form ty2)
           exp)))
 
   ;;;;;;;;;;;;;;;; The Type Checker ;;;;;;;;;;;;;;;;
-  
+
   ;; type-of-program : Program -> Type
   ;; Page: 244
   (define type-of-program
@@ -80,7 +80,7 @@
             (proc-type var-type result-type)))
 
         ;; \commentbox{\apprule}
-        (call-exp (rator rand) 
+        (call-exp (rator rand)
           (let ((rator-type (type-of rator tenv))
                 (rand-type  (type-of rand tenv)))
             (cases type rator-type
@@ -98,62 +98,89 @@
                   (extend-tenv p-name
                     (proc-type b-var-type p-result-type)
                     tenv)))
-            (let ((p-body-type 
+            (let ((p-body-type
                     (type-of p-body
                       (extend-tenv b-var b-var-type
-                        tenv-for-letrec-body)))) 
+                        tenv-for-letrec-body))))
               (check-equal-type!
                 p-body-type p-result-type p-body)
               (type-of letrec-body tenv-for-letrec-body))))
 
-       (showstore-exp ()
-              (eopl:error "not implemented!"))
+        ;; new for hw5
+        (newref-exp (e)
+          ;;check type of referenced expression
+          (type-of e tenv)
+          ;;return type for newref-exp, always ref-type
+          (ref-type))
+        ;;new for hw 5
+        (deref-exp (e)
+          (let
+            ;;get e type
+            ((e-type (type-of e tenv)))
+            ;;check that it's ref-type
+            (check-equal-type! e-type (ref-type) e)))
+        ;;new for hw 5
+        (setref-exp (le re)
+          (let
+            ( ;;get left exp type
+              (le-type (type-of le tenv))
+              ;;get right exp type
+              (re-type (type-of re tenv)))
+              ;;check left exp type is ref-type
+            (check-equal-type! le-type (ref-type) le))
+          ;;return dummy-type
+          (unit-type))
+        ;;new for hw 5
+        (pair-exp (exp1 exp2)
+          (eopl:error "not implemented!"))
+        ;;new for hw 5
+        (unpair-exp (id-1 id-2 exp1 body)
+          (eopl:error "not implemented!"))
+        ;;new for hw 5
+        (showstore-exp ()
+          (eopl:error "not implemented!"))
+        ;;new for hw 5
+        (begin-exp (e exps)
+          (eopl:error "not implemented!"))
+        ;;new for hw 5
+        (for-exp (id lb up body)
+          (eopl:error "not implemented!"))
+      )
+    )
+  )
 
-        (begin-exp (e exps) (eopl:error "not implemented!"))
-        
-       (newref-exp (e) (eopl:error "not implemented!"))
-        
-      (deref-exp (e) (eopl:error "not implemented!"))
-        
-      (setref-exp (le re)  (eopl:error "not implemented!"))
-
-      (for-exp (id lb up body) (eopl:error "not implemented!"))
-        
-
-        )))
-    
   (define report-rator-not-a-proc-type
     (lambda (rator-type rator)
       (eopl:error 'type-of-expression
-        "Rator not a proc type:~%~s~%had rator type ~s"   
-           rator 
+        "Rator not a proc type:~%~s~%had rator type ~s"
+           rator
            (type-to-external-form rator-type))))
 
   ;;;;;;;;;;;;;;;; type environments ;;;;;;;;;;;;;;;;
-    
+
   (define-datatype type-environment type-environment?
     (empty-tenv-record)
     (extended-tenv-record
       (sym symbol?)
       (type type?)
       (tenv type-environment?)))
-    
+
   (define empty-tenv empty-tenv-record)
   (define extend-tenv extended-tenv-record)
-    
-  (define apply-tenv 
+
+  (define apply-tenv
     (lambda (tenv sym)
       (cases type-environment tenv
         (empty-tenv-record ()
           (eopl:error 'apply-tenv "Unbound variable ~s" sym))
         (extended-tenv-record (sym1 val1 old-env)
-          (if (eqv? sym sym1) 
+          (if (eqv? sym sym1)
             val1
             (apply-tenv old-env sym))))))
-  
+
   (define init-tenv
     (lambda ()
-      (extend-tenv 'x (int-type) 
+      (extend-tenv 'x (int-type)
         (extend-tenv 'v (int-type)
           (extend-tenv 'i (int-type)
             (empty-tenv))))))
