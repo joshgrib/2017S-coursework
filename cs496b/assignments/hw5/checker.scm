@@ -127,9 +127,9 @@
               ;;get right exp type
               (re-type (type-of re tenv)))
               ;;check left exp type is ref-type
-            (check-equal-type! le-type (ref-type) le))
-          ;;return dummy-type
-          (unit-type))
+            (check-equal-type! le-type (ref-type) le)
+            ;;return dummy-type
+            (unit-type)))
         ;;new for hw 5
         (pair-exp (exp1 exp2)
           (eopl:error "not implemented!"))
@@ -138,19 +138,37 @@
           (eopl:error "not implemented!"))
         ;;new for hw 5
         (emptylist-exp (t1)
-          (eopl:error "not implemented!"))
+          (list-type t1))
         ;;new for hw 5
         (cons-exp (exp1 exp2)
-          (eopl:error "not implemented!"))
+          (let ((t1 (type-of exp1 tenv))
+                (t2 (type-of exp2 tenv)))
+            (check-equal-type! t2 (list-type t1) exp2)
+            (list-type t1)))
         ;;new for hw 5
         (null?-exp (exp1)
-          (eopl:error "not implemented!"))
+          (let ((t1 (type-of exp1 tenv)))
+            (cases type t1
+              (list-type (lt)
+                (check-equal-type! t1 (list-type lt) exp1)
+                (bool-type))
+              (else (eopl:error "Improper type for null?-exp - not a list-type")))))
         ;;new for hw 5
         (car-exp (exp1)
-          (eopl:error "not implemented!"))
+          (let ((t1 (type-of exp1 tenv)))
+            (cases type t1
+              (list-type (lt)
+                (check-equal-type! t1 (list-type lt) exp1)
+                lt)
+              (else (eopl:error "Improper type for car-exp - not a list-type")))))
         ;;new for hw 5
         (cdr-exp (exp1)
-          (eopl:error "not implemented!"))
+          (let ((t1 (type-of exp1 tenv)))
+            (cases type t1
+              (list-type (lt)
+                (check-equal-type! t1 (list-type lt) exp1)
+                (list-type lt))
+              (else (eopl:error "Improper type for cdr-exp - not a list-type")))))
         ;;new for hw 5
         (emptytree-exp (t1)
           (eopl:error "not implemented!"))
@@ -171,13 +189,13 @@
           (eopl:error "not implemented!"))
         ;;new for hw 5
         (showstore-exp ()
-          (eopl:error "not implemented!"))
+          (eopl:error "part of stub but not part of assignment."))
         ;;new for hw 5
         (begin-exp (e exps)
-          (eopl:error "not implemented!"))
+          (eopl:error "part of stub but not part of assignment."))
         ;;new for hw 5
         (for-exp (id lb up body)
-          (eopl:error "not implemented!"))
+          (eopl:error "part of stub but not part of assignment."))
       )
     )
   )
