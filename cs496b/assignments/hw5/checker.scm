@@ -107,86 +107,164 @@
               (type-of letrec-body tenv-for-letrec-body))))
 
         ;; new for hw5
-        (newref-exp (e)
-          ;;check type of referenced expression
-          (type-of e tenv)
-          ;;return type for newref-exp, always ref-type
-          (ref-type))
+        ;;      tenv|-e::t
+        ;;=======================
+        ;;tenv|-newref(e)::ref(t)
+        (newref-exp (exp1)
+          (let ((t1 (type-of exp1 tenv)))
+            (ref-type t1)))
         ;;new for hw 5
-        (deref-exp (e)
-          (let
-            ;;get e type
-            ((e-type (type-of e tenv)))
-            ;;check that it's ref-type
-            (check-equal-type! e-type (ref-type) e)))
+        ;; tenv|-e::ref(t)
+        ;;=================
+        ;;tenv|-deref(e)::t
+        (deref-exp (exp1)
+          (let ((t1 (type-of exp1 tenv)))
+            (cases type t1
+              (ref-type (rt)
+                rt)
+              (else (eopl:error "Improper type for deref-exp: not a ref-type")))))
         ;;new for hw 5
-        (setref-exp (le re)
-          (let
-            ( ;;get left exp type
-              (le-type (type-of le tenv))
-              ;;get right exp type
-              (re-type (type-of re tenv)))
-              ;;check left exp type is ref-type
-            (check-equal-type! le-type (ref-type) le)
-            ;;return dummy-type
-            (unit-type)))
+        ;;tenv|-e1::ref(t)   tenv|-e2::t
+        ;;==============================
+        ;;   tenv|-setref(e1,e2)::unit
+        (setref-exp (exp1 exp2)
+          (let ((t1 (type-of exp1 tenv))
+                (t2 (type-of exp2 tenv)))
+            (cases type t1
+              (ref-type (rt)
+                (check-equal-type! rt t2 (setref-exp (exp1 exp2)))
+                (unit-type))
+              (else (eopl:error "Improper type for setref-exp: not a ref-type")))))
         ;;new for hw 5
+        ;;tenv|-e1::t1   tenv|-e2::t2
+        ;;===========================
+        ;;tenv|-pair(e1,e2)::<t1*t2>
         (pair-exp (exp1 exp2)
-          (eopl:error "not implemented!"))
+          (let ((t1 (type-of exp1 tenv))
+                (t2 (type-of exp2 tenv)))
+            (pair-type t1 t2)))
         ;;new for hw 5
-        (unpair-exp (id-1 id-2 exp1 body)
-          (eopl:error "not implemented!"))
+        ;;tenv2 = tenv + {id1:t1, id2:t2}
+        ;; tenv|-exp1::<t1*t2>   tenv2|-e2::t0
+        ;;======================================
+        ;;tenv|-unpair(id1,id2)=exp1 in body::t0
+        (unpair-exp (id1 id2 exp1 body)
+          (let ((ptype (type-of exp1 tenv)))
+            (cases type ptype
+              (pair-type (t1 t2)
+                (type-of
+                  body
+                  (extend-tenv id1 t1 (extend-tenv id2 t2 tenv))))
+              (else (eopl:error "Improper type for unpair-exp: not a pair-type")))))
         ;;new for hw 5
+        ;;
+        ;;==========================
+        ;;tenv|-emptylist t::list(t)
         (emptylist-exp (t1)
           (list-type t1))
         ;;new for hw 5
+        ;;tenv|-e1::t   tenv|-e2::list(t)
+        ;;===============================
+        ;;   tenv|-cons(e1,e2)::list(t)
         (cons-exp (exp1 exp2)
           (let ((t1 (type-of exp1 tenv))
                 (t2 (type-of exp2 tenv)))
             (check-equal-type! t2 (list-type t1) exp2)
             (list-type t1)))
         ;;new for hw 5
+        ;;  tenv|-e::list(t)
+        ;;====================
+        ;;tenv|-null?(e)::bool
         (null?-exp (exp1)
           (let ((t1 (type-of exp1 tenv)))
             (cases type t1
               (list-type (lt)
                 (check-equal-type! t1 (list-type lt) exp1)
                 (bool-type))
-              (else (eopl:error "Improper type for null?-exp - not a list-type")))))
+              (else (eopl:error "Improper type for null?-exp: not a list-type")))))
         ;;new for hw 5
+        ;;tenv|-e::list(t)
+        ;;================
+        ;; tenv|-car(e)::t
         (car-exp (exp1)
           (let ((t1 (type-of exp1 tenv)))
             (cases type t1
               (list-type (lt)
                 (check-equal-type! t1 (list-type lt) exp1)
                 lt)
-              (else (eopl:error "Improper type for car-exp - not a list-type")))))
+              (else (eopl:error "Improper type for car-exp: not a list-type")))))
         ;;new for hw 5
+        ;;  tenv|-e::list(t)
+        ;;=====================
+        ;;tenv|-cdr(e)::list(t)
         (cdr-exp (exp1)
           (let ((t1 (type-of exp1 tenv)))
             (cases type t1
               (list-type (lt)
                 (check-equal-type! t1 (list-type lt) exp1)
                 (list-type lt))
-              (else (eopl:error "Improper type for cdr-exp - not a list-type")))))
+              (else (eopl:error "Improper type for cdr-exp: not a list-type")))))
         ;;new for hw 5
+        ;;
+        ;;==========================
+        ;;tenv|-emptytree t::tree(t)
         (emptytree-exp (t1)
-          (eopl:error "not implemented!"))
+          (tree-type t1))
         ;;new for hw 5
+        ;;tenv|-e1::t   tenv|-e2::tree(t)   tenv|-e3::tree(t)
+        ;;===================================================
+        ;;         tenv|-node(e1,e2,e3)::tree(t)
         (node-exp (exp1 exp2 exp3)
-          (eopl:error "not implemented!"))
+          (let ((t1 (type-of exp1 tenv))
+                (t2 (type-of exp2 tenv))
+                (t3 (type-of exp3 tenv)))
+            (check-equal-type! t2 (tree-type t1) exp2)
+            (check-equal-type! t3 (tree-type t1) exp3)
+            (tree-type t1)))
         ;;new for hw 5
+        ;;  tenv|-e::tree(t)
+        ;;=====================
+        ;;tenv|-nullT?(e)::bool
         (nullT?-exp (exp1)
-          (eopl:error "not implemented!"))
+          (let ((t1 (type-of exp1 tenv)))
+            (cases type t1
+              (tree-type (tt)
+                (check-equal-type! t1 (tree-type tt))
+                (bool-type))
+              (else (eopl:error "Improper type for nullT?-exp: not a tree-type")))))
         ;;new for hw 5
+        ;; tenv|-e::tree(t)
+        ;;===================
+        ;;tenv|-getData(e)::t
         (getData-exp (exp1)
-          (eopl:error "not implemented!"))
+          (let ((t1 (type-of exp1 tenv)))
+            (cases type t1
+              (tree-type (tt)
+                (check-equal-type! t1 (tree-type tt))
+                tt)
+              (else (eopl:error "Improper type for getData-exp: not a tree-type")))))
         ;;new for hw 5
+        ;;   tenv|-e::tree(t)
+        ;;========================
+        ;;tenv|-getLST(e)::tree(t)
         (getLST-exp (exp1)
-          (eopl:error "not implemented!"))
+          (let ((t1 (type-of exp1 tenv)))
+            (cases type t1
+              (tree-type (tt)
+                (check-equal-type! t1 (tree-type tt))
+                (tree-type tt))
+              (else (eopl:error "Improper type for getLST-exp: not a tree-type")))))
         ;;new for hw 5
+        ;;   tenv|-e::tree(t)
+        ;;=======================
+        ;;tenv|-getRST(e)::tree(t)
         (getRST-exp (exp1)
-          (eopl:error "not implemented!"))
+          (let ((t1 (type-of exp1 tenv)))
+            (cases type t1
+              (tree-type (tt)
+                (check-equal-type! t1 (tree-type tt))
+                (tree-type tt))
+              (else (eopl:error "Improper type for getRST-exp: not a tree-type")))))
         ;;new for hw 5
         (showstore-exp ()
           (eopl:error "part of stub but not part of assignment."))

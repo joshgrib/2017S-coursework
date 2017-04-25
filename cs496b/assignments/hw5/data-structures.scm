@@ -66,7 +66,7 @@
       (cases expval v
         (pair-val (e1 e2)e2)
         (else (expval-extractor-error 'pair v)))))
-        
+
   ;;new for hw 5
   (define expval->null?
     (lambda (l)
@@ -77,7 +77,7 @@
   (define expval->car
     (lambda (l)
       (cases expval l
-        (list-val (l) (list-val (car l)))
+        (list-val (l) (car l))
         (else (expval-extractor-error 'list l)))))
   ;;new for hw 5
   (define expval->cdr
@@ -92,9 +92,11 @@
       (cases expval t
         (tree-val (n lst rst)
           (and
+            ;;THIS ISN'T WORKING
             (eq? n (unit-val))
-            (eq? lst (unit-val))
-            (eq? rst (unit-val))))
+            ;;(eq? lst (unit-val))
+            ;;(eq? rst (unit-val))
+          ))
         (else (expval-extractor-error 'tree t)))))
   ;;new for hw 5
   (define expval->getData
