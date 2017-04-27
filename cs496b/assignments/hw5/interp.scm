@@ -180,7 +180,8 @@
         ;;new for hw 5
         (nullT?-exp (exp1)
           (let ((t1 (value-of exp1 env)))
-            (bool-val (eq? t1 (emptytree)))))
+            (bool-val (expval->nullT? t1))
+            ))
         ;;new for hw 5
         (getData-exp (exp1)
           (let ((t1 (value-of exp1 env)))
