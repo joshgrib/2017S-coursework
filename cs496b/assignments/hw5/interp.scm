@@ -170,7 +170,7 @@
             (expval->cdr v1)))
         ;;new for hw 5
         (emptytree-exp (t1)
-          (tree-val (unit-val) (unit-val) (unit-val)))
+          (emptytree))
         ;;new for hw 5
         (node-exp (exp1 exp2 exp3)
           (let ((v1 (value-of exp1 env))
@@ -180,7 +180,7 @@
         ;;new for hw 5
         (nullT?-exp (exp1)
           (let ((t1 (value-of exp1 env)))
-            (bool-val (expval->nullT? t1))))
+            (bool-val (eq? t1 (emptytree)))))
         ;;new for hw 5
         (getData-exp (exp1)
           (let ((t1 (value-of exp1 env)))

@@ -26,6 +26,7 @@
       (node expval?)
       (lst expval?)
       (rst expval?))
+    (emptytree)
   )
 
 ;;; extractors:
@@ -58,13 +59,13 @@
   (define expval->fst
     (lambda (v)
       (cases expval v
-        (pair-val (e1 e2)e1)
+        (pair-val (e1 e2) e1)
         (else (expval-extractor-error 'pair v)))))
   ;;new for hw 5
   (define expval->snd
     (lambda (v)
       (cases expval v
-        (pair-val (e1 e2)e2)
+        (pair-val (e1 e2) e2)
         (else (expval-extractor-error 'pair v)))))
 
   ;;new for hw 5
@@ -90,13 +91,8 @@
   (define expval->nullT?
     (lambda (t)
       (cases expval t
-        (tree-val (n lst rst)
-          (and
-            ;;THIS ISN'T WORKING
-            (eq? n (unit-val))
-            ;;(eq? lst (unit-val))
-            ;;(eq? rst (unit-val))
-          ))
+        (tree-val (n lst rst) #f)
+        (emptytree () #t)
         (else (expval-extractor-error 'tree t)))))
   ;;new for hw 5
   (define expval->getData
@@ -104,6 +100,7 @@
       (cases expval t
         (tree-val (n lst rst)
           n)
+        (emptytree () (unit-val))
         (else (expval-extractor-error 'tree t)))))
   ;;new for hw 5
   (define expval->getLST
@@ -111,6 +108,7 @@
       (cases expval t
         (tree-val (n lst rst)
           lst)
+        (emptytree () (unit-val))
         (else (expval-extractor-error 'tree t)))))
   ;;new for hw 5
   (define expval->getRST
@@ -118,6 +116,7 @@
       (cases expval t
         (tree-val (n lst rst)
           rst)
+        (emptytree () (unit-val))
         (else (expval-extractor-error 'tree t)))))
 
   (define expval-extractor-error

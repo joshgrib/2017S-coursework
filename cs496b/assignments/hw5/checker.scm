@@ -130,11 +130,8 @@
         (setref-exp (exp1 exp2)
           (let ((t1 (type-of exp1 tenv))
                 (t2 (type-of exp2 tenv)))
-            (cases type t1
-              (ref-type (rt)
-                (check-equal-type! rt t2 (setref-exp (exp1 exp2)))
-                (unit-type))
-              (else (eopl:error "Improper type for setref-exp: not a ref-type")))))
+            (check-equal-type! t1 (ref-type t2) exp2)
+                (unit-type)))
         ;;new for hw 5
         ;;tenv|-e1::t1   tenv|-e2::t2
         ;;===========================
@@ -229,7 +226,7 @@
           (let ((t1 (type-of exp1 tenv)))
             (cases type t1
               (tree-type (tt)
-                (check-equal-type! t1 (tree-type tt))
+                (check-equal-type! t1 (tree-type tt) exp1)
                 (bool-type))
               (else (eopl:error "Improper type for nullT?-exp: not a tree-type")))))
         ;;new for hw 5
@@ -240,7 +237,7 @@
           (let ((t1 (type-of exp1 tenv)))
             (cases type t1
               (tree-type (tt)
-                (check-equal-type! t1 (tree-type tt))
+                (check-equal-type! t1 (tree-type tt) exp1)
                 tt)
               (else (eopl:error "Improper type for getData-exp: not a tree-type")))))
         ;;new for hw 5
@@ -251,7 +248,7 @@
           (let ((t1 (type-of exp1 tenv)))
             (cases type t1
               (tree-type (tt)
-                (check-equal-type! t1 (tree-type tt))
+                (check-equal-type! t1 (tree-type tt) exp1)
                 (tree-type tt))
               (else (eopl:error "Improper type for getLST-exp: not a tree-type")))))
         ;;new for hw 5
@@ -262,7 +259,7 @@
           (let ((t1 (type-of exp1 tenv)))
             (cases type t1
               (tree-type (tt)
-                (check-equal-type! t1 (tree-type tt))
+                (check-equal-type! t1 (tree-type tt) exp1)
                 (tree-type tt))
               (else (eopl:error "Improper type for getRST-exp: not a tree-type")))))
         ;;new for hw 5
