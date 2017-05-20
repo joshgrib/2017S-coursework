@@ -18,9 +18,6 @@
   ;; say (instrument-let #t) to turn instrumentation on.
   ;;     (instrument-let #f) to turn it off again.
 
-  ;;;;;;;;;;;;;;;; Declared ADTs ;;;;;;;;;;;;;;;;
-
-  (define global-adts '())
 
   ;;;;;;;;;;;;;;;; the interpreter ;;;;;;;;;;;;;;;;
 

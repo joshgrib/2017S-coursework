@@ -22,6 +22,10 @@
           (type-to-external-form ty2)
           exp)))
 
+  ;;;;;;;;;;;;;;;; Declared ADTs ;;;;;;;;;;;;;;;;
+
+  (define global-adts '())
+
   ;;;;;;;;;;;;;;;; The Type Checker ;;;;;;;;;;;;;;;;
 
   ;; type-of-program : Program -> Type
@@ -165,5 +169,3 @@
         (extend-tenv 'v (int-type)
           (extend-tenv 'i (int-type)
             (empty-tenv))))))
-
-  )
